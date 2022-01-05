@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
-
 import auth from "../services/authService";
+import VideoModal from "./videoModal";
 
 const Chat = ({
   conversations,
@@ -61,18 +61,27 @@ const Chat = ({
   //   }, [socket, messages]);
   return (
     <div className="chat  border">
-      <div className="chat-header bg-secondary text-white">
-        <li className="list-group-item-active list-inline">
+      <div className="chat-header bg-secondary text-white d-flex">
+        <li className="list-group-item-active list-inline m-1">
           <img
             src={process.env.REACT_APP_USER_IMAGE_URL + receiver.file}
             className="img-fluid rounded-start img-thumbnail m-2"
             alt="friend"
-            height="25"
-            width="25"
+            height="35"
+            width="35"
             style={{ cursor: "pointer" }}
           />
-          {receiver.name}
+          <strong> {receiver.name}</strong>{" "}
         </li>
+        <div className="m-2 ms-auto">
+          <i
+            className="fa-2x fa fa-video-camera"
+            aria-hidden="true"
+            data-bs-toggle="modal"
+            data-bs-target="#videoModal"
+            style={{ cursor: "pointer" }}
+          ></i>
+        </div>
       </div>
       <div
         className="chat-body w-100 "
@@ -124,11 +133,11 @@ const Chat = ({
               }}
             />
           </div>
-          <div className="col-2">
+          <div className="col-2 ms-auto">
             {message.length > 0 && (
               <button
                 type="submit"
-                className="btn btn-sm btn-outline-primary mx-2"
+                className="btn btn-sm btn-success mx-2 rounded-circle"
               >
                 <i className="fa fa-paper-plane" aria-hidden="true"></i>
               </button>
@@ -136,6 +145,7 @@ const Chat = ({
           </div>
         </form>
       </div>
+      <VideoModal />
     </div>
   );
 };

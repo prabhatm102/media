@@ -11,7 +11,7 @@ import Chat from "./chats.jsx";
 import auth from "../services/authService";
 
 const socket = io.connect(process.env.REACT_APP_SOCKET_URL);
-
+export { socket };
 const Conversation = ({ user }) => {
   const [friends, setFriends] = useState([]);
   const [conversations, setConversations] = useState([]);

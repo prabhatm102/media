@@ -5,7 +5,7 @@ const FriendList = ({ friends, onShowConversation }) => {
     <div>
       <div className="friends">
         <div className="friends-header bg-success text-white text-center fs-3">
-          Friends
+          <strong>Friends</strong>
         </div>
         <div className="friends-body">
           <ul className="list-group">
@@ -25,7 +25,7 @@ const FriendList = ({ friends, onShowConversation }) => {
                   height="25"
                   width="25"
                 />
-                {friend.name}
+                <strong> {friend.name}</strong>
               </li>
             ))}
           </ul>
