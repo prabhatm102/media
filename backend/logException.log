@@ -1,0 +1,20 @@
+{"level":"error","message":"Cast to ObjectId failed for value \"ktr\" (type string) at path \"_id\" for model \"users\""}
+{"level":"error","message":"Projection cannot have a mix of inclusion and exclusion."}
+{"level":"error","message":"Cannot read properties of undefined (reading 'length')"}
+{"level":"error","message":"Cannot read properties of undefined (reading '_id')"}
+{"level":"error","message":"Cannot read properties of undefined (reading 'id')"}
+{"level":"error","message":"connect ECONNREFUSED 127.0.0.1:27017"}
+{"level":"error","message":"friendList is not defined"}
+{"level":"error","message":"friendList is not defined"}
+{"level":"error","message":"friendList is not defined"}
+{"level":"error","message":"friendList is not defined"}
+{"level":"error","message":"friendList is not defined"}
+{"level":"error","message":"friendList is not defined"}
+{"level":"error","message":"No matching document found for id \"61cae8dce6dd93b528bd020a\" version 70 modifiedPaths \"friends\""}
+{"level":"error","message":"No matching document found for id \"61cae8dce6dd93b528bd020a\" version 73 modifiedPaths \"friends\""}
+{"level":"error","message":"No matching document found for id \"61cae8dce6dd93b528bd020a\" version 73 modifiedPaths \"friends\""}
+{"level":"error","message":"No matching document found for id \"61cae953e6dd93b528bd0223\" version 15 modifiedPaths \"friends\""}
+{"level":"error","message":"Cannot read properties of undefined (reading 'filename')"}
+{"level":"error","message":"Cannot read properties of undefined (reading 'filename')"}
+{"level":"error","message":"Cannot read properties of undefined (reading 'filename')"}
+{"level":"error","message":"Cannot read properties of undefined (reading 'filename')"}
