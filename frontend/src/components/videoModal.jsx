@@ -1,6 +1,17 @@
-import React from "react";
+import React, { useContext } from "react";
+import { SocketContext } from "../context/socketContext";
 
 export default function UserModel() {
+  const {
+    name,
+    callAccepted,
+    myVideo,
+    userVideo,
+    callEnded,
+    stream,
+    call,
+    leaveCall,
+  } = useContext(SocketContext);
   return (
     <div>
       <div
@@ -13,23 +24,34 @@ export default function UserModel() {
         <div className="modal-dialog  modal-fullscreen">
           <div className="modal-content">
             <div className="modal-body position-relative   h-100 w-100">
-              <iframe
-                src=""
-                title="YouTube video"
-                allowFullScreen
-                className="position-absolute h-100 w-100"
-              ></iframe>
-              <iframe
-                src=""
-                title="YouTube video"
-                allowFullScreen
-                className="position-absolute h-25 w-25 bottom-0 end-0"
-              ></iframe>
+              {callAccepted && !callEnded && (
+                <>
+                  {call.name}
+                  <iframe
+                    src={userVideo}
+                    title="User video"
+                    allowFullScreen
+                    className="position-absolute h-100 w-100"
+                  ></iframe>
+                </>
+              )}
+              {stream && (
+                <>
+                  {name}
+                  <iframe
+                    src={myVideo}
+                    title="My video"
+                    allowFullScreen
+                    className="position-absolute h-25 w-25 bottom-0 end-0"
+                  ></iframe>
+                </>
+              )}
             </div>
             <div className="me-auto offset-5">
               <button
                 type="button"
                 className="btn btn-danger rounded-circle"
+                onClick={leaveCall}
                 data-bs-dismiss="modal"
               >
                 <i className="fa-2x fa fa-phone" aria-hidden="true"></i>

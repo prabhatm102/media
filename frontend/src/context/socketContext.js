@@ -1,19 +1,20 @@
 import React, { createContext, useState, useRef, useEffect } from "react";
-import { io } from "socket.io-client";
+import io from "socket.io-client";
 import Peer from "simple-peer";
+import auth from "../services/authService";
 
 const SocketContext = createContext();
 
 // const socket = io('http://localhost:5000');
-const socket = io("https://video-chat1-backend.herokuapp.com/");
-
+const socket = io.connect(process.env.REACT_APP_SOCKET_URL);
+export { socket };
 const ContextProvider = ({ children }) => {
   const [callAccepted, setCallAccepted] = useState(false);
   const [callEnded, setCallEnded] = useState(false);
   const [stream, setStream] = useState();
   const [name, setName] = useState("");
   const [call, setCall] = useState({});
-  const [me, setMe] = useState("");
+  // const [me, setMe] = useState("");
 
   const myVideo = useRef();
   const userVideo = useRef();
@@ -28,7 +29,7 @@ const ContextProvider = ({ children }) => {
         myVideo.current.srcObject = currentStream;
       });
 
-    socket.on("me", (id) => setMe(id));
+    // socket.on("me", (id) => setMe(id));
 
     socket.on("callUser", ({ from, name: callerName, signal }) => {
       setCall({ isReceivingCall: true, from, name: callerName, signal });
@@ -60,8 +61,8 @@ const ContextProvider = ({ children }) => {
       socket.emit("callUser", {
         userToCall: id,
         signalData: data,
-        from: me,
-        name,
+        from: auth.getCurrentUser()._id,
+        name: auth.getCurrentUser().name,
       });
     });
 
@@ -97,7 +98,7 @@ const ContextProvider = ({ children }) => {
         name,
         setName,
         callEnded,
-        me,
+        //  me,
         callUser,
         leaveCall,
         answerCall,

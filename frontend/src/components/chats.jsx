@@ -1,6 +1,7 @@
-import React, { useEffect, useRef } from "react";
+import React, { useContext, useEffect, useRef } from "react";
 import auth from "../services/authService";
 import VideoModal from "./videoModal";
+import { SocketContext } from "../context/socketContext";
 
 const Chat = ({
   conversations,
@@ -13,6 +14,8 @@ const Chat = ({
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [conversations]);
+
+  const { callUser } = useContext(SocketContext);
   // const months = [
   //   "jan",
   //   "feb",
@@ -77,6 +80,7 @@ const Chat = ({
           <i
             className="fa-2x fa fa-video-camera"
             aria-hidden="true"
+            onClick={callUser(receiver._id)}
             data-bs-toggle="modal"
             data-bs-target="#videoModal"
             style={{ cursor: "pointer" }}

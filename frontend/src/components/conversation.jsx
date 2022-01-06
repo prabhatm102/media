@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { toast } from "react-toastify";
-import io from "socket.io-client";
+// import io from "socket.io-client";
+import { socket } from "../context/socketContext";
 import {
   getConversations,
   saveConversation,
@@ -9,16 +10,18 @@ import { getFriends } from "../services/userService";
 import FriendList from "./friendList";
 import Chat from "./chats.jsx";
 import auth from "../services/authService";
+import { SocketContext } from "../context/socketContext";
+//const socket = io.connect(process.env.REACT_APP_SOCKET_URL);
 
-const socket = io.connect(process.env.REACT_APP_SOCKET_URL);
-export { socket };
 const Conversation = ({ user }) => {
   const [friends, setFriends] = useState([]);
   const [conversations, setConversations] = useState([]);
   const [receiver, setReceiver] = useState({});
   const [message, setMessage] = useState("");
   // const [userStatus, setUserStatus] = useState([]);
-
+  //...............
+  const { answerCall, call, callAccepted } = useContext(SocketContext);
+  //..............
   const showConversation = (friend) => {
     const getChats = async () => {
       try {
@@ -89,6 +92,19 @@ const Conversation = ({ user }) => {
           )}
         </div>
         <div className="col">
+          {call.isReceivingCall && !callAccepted && (
+            <div style={{ display: "flex", justifyContent: "space-around" }}>
+              <h1>{call.name} is calling:</h1>
+              <button
+                className="btn btn-primary"
+                data-bs-toggle="modal"
+                data-bs-target="#videoModal"
+                onClick={answerCall}
+              >
+                Answer
+              </button>
+            </div>
+          )}
           {receiver._id && (
             <Chat
               conversations={conversations}
