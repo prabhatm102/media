@@ -16,7 +16,7 @@ import "./App.css";
 import "react-toastify/dist/ReactToastify.css";
 import React, { useState, useEffect } from "react";
 import CurrentUser from "./context/currentUser";
-import { ContextProvider } from "./context/socketContext";
+// import { ContextProvider } from "./context/socketContext";
 
 function App() {
   const [user, setUser] = useState();
@@ -45,12 +45,12 @@ function App() {
             />
             {/* <ProtectedRouteAdmin path="/users" component={Users} /> */}
             <ProtectedRoute path="/users" component={Users} />
-            <ContextProvider>
-              <ProtectedRoute
-                path="/conversation"
-                render={(props) => <Conversation {...props} user={user} />}
-              />
-            </ContextProvider>
+            {/* <ContextProvider> */}
+            <ProtectedRoute
+              path="/conversation"
+              render={(props) => <Conversation {...props} user={user} />}
+            />
+            {/* </ContextProvider> */}
 
             <Route path="/notFound" component={NotFound} />
             <Redirect to="/notFound" />

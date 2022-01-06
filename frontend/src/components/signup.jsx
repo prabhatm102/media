@@ -96,7 +96,7 @@ const Signup = () => {
   // };
 
   return (
-    <div className="row shadow p-3 mb-5 bg-body rounded offset-3 col-6">
+    <div className="row shadow p-3 mb-5 bg-body rounded offset-md-3  col-sm-* col-md-6">
       {auth.getCurrentUser() && <Redirect to="/" />}
       <h1 className="offset-3 col-6 text-center">Sign Up </h1>
       <form onSubmit={handleSubmit} encType="multipart/form-data">
