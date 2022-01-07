@@ -120,13 +120,19 @@ export default function PostForm({ user, posts, setPosts }) {
                 onChange={(e) => handleChange(e.currentTarget)}
               />
               <div className="form-group m-2">
-                <input
-                  type="file"
-                  className="form-control"
-                  id="postFile"
-                  name="postFile"
-                  onChange={(e) => handleChange(e.currentTarget)}
-                />
+                <label className="btn btn-outline-success">
+                  <span>
+                    <i className="fa-2x fa fa-file-image-o"></i>
+                  </span>
+                  <input
+                    type="file"
+                    style={{ display: "none" }}
+                    className="form-control"
+                    id="postFile"
+                    name="postFile"
+                    onChange={(e) => handleChange(e.currentTarget)}
+                  />
+                </label>
               </div>
               {data.message.length > 0 && (
                 <button

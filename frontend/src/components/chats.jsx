@@ -1,4 +1,4 @@
-import React, {  useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import auth from "../services/authService";
 // import { SocketContext } from "../context/socketContext";
 
@@ -7,29 +7,17 @@ const Chat = ({
   receiver,
   onSendMessage,
   onMessage,
+  onClearChat,
+  onWallPaperChange,
   message,
   callUser,
+  wallPaper,
 }) => {
   const scrollRef = useRef(null);
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [conversations]);
 
-  // const { callUser } = useContext(SocketContext);
-  // const months = [
-  //   "jan",
-  //   "feb",
-  //   "march",
-  //   "april",
-  //   "may",
-  //   "june",
-  //   "july",
-  //   "aug",
-  //   "sept",
-  //   "oct",
-  //   "nov",
-  //   "dec",
-  // ];
   const getTime = (date) => {
     const d = new Date();
     if (d.getHours() === date.getHours()) {
@@ -39,57 +27,75 @@ const Chat = ({
     }
     return date.toLocaleTimeString();
   };
-  //   const [message, setMessage] = useState("");
-  //   const [messages, setMessages] = useState([]);
 
-  //   const handleSendMessage = async (e) => {
-  //     e.preventDefault();
-  //     if (message.trim() !== "") {
-  //       const messageFormate = {
-  //         message,
-  //         room,
-  //         username,
-  //         time: new Date().getHours() + ":" + new Date().getMinutes(),
-  //       };
-  //       await socket.emit("sendMessage", messageFormate);
-  //       setMessages([...messages, messageFormate]);
-  //       setMessage("");
-  //     }
-  //   };
-
-  //   useEffect(() => {
-  //     socket.on("receiveMessage", (data) => {
-  //       setMessages([...messages, data]);
-  //     });
-  //   }, [socket, messages]);
   return (
     <div className="chat  border">
       <div className="chat-header bg-secondary text-white d-flex">
         <li className="list-group-item-active list-inline m-1">
           <img
             src={process.env.REACT_APP_USER_IMAGE_URL + receiver.file}
-            className="img-fluid rounded-start img-thumbnail m-2"
+            className="img-fluid rounded-circle m-2"
             alt="friend"
-            height="35"
-            width="35"
-            style={{ cursor: "pointer" }}
+            style={{ height: "40px", width: "40px", cursor: "pointer" }}
           />
           <strong> {receiver.name}</strong>{" "}
         </li>
-        <div className="m-2 ms-auto">
+        <div className="mt-3 ms-auto dropstart">
           <i
-            className="fa-2x fa fa-video-camera"
+            className="me-5 fa-2x fa fa-video-camera"
             aria-hidden="true"
             onClick={() => callUser(receiver._id)}
             data-bs-toggle="modal"
             data-bs-target="#videoModal"
             style={{ cursor: "pointer" }}
           ></i>
+          <i
+            className=" fa-2x fa fa-ellipsis-v me-3 "
+            aria-hidden="true"
+            style={{ cursor: "pointer" }}
+            data-bs-toggle="dropdown"
+          ></i>
+          <ul className="dropdown-menu">
+            <li>
+              <span className="dropdown-item">View</span>
+            </li>
+            <li>
+              <label className="">
+                <span className="dropdown-item">Wallpaper</span>
+                <input
+                  type="file"
+                  style={{ display: "none" }}
+                  className="form-control"
+                  id="wallPaper"
+                  name="wallPaper"
+                  onChange={(e) => onWallPaperChange(e.currentTarget)}
+                />
+              </label>
+            </li>
+            <li>
+              <span
+                className="dropdown-item"
+                onClick={() =>
+                  onClearChat(
+                    conversations.length > 0
+                      ? conversations[0].conversation
+                      : receiver._id
+                  )
+                }
+              >
+                Clear chat
+              </span>
+            </li>
+          </ul>
         </div>
       </div>
       <div
-        className="chat-body w-100 "
-        style={{ height: "400px", overflow: "scroll" }}
+        className="chat-body w-100"
+        style={{
+          height: "400px",
+          overflow: "scroll",
+          background: ` url(${wallPaper}) top right / cover scroll no-repeat`,
+        }}
       >
         {conversations.length > 0 &&
           conversations.map((conversation) => (

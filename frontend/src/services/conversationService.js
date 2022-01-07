@@ -12,6 +12,6 @@ export const saveConversation = (conversation) => {
 
 // export const updateConversation = (conversation) => {};
 
-// export const deleteConversation = (conversation) => {
-//   return http.delete(apiEndpoint + "/" + conversation._id);
-// };
+export const deleteConversation = (conversationId) => {
+  return http.delete(apiEndpoint + "/" + conversationId);
+};

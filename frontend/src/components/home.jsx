@@ -28,7 +28,7 @@ const Home = ({ user }) => {
   }, []);
 
   return (
-    <div className="container-fluid shadow p-3 mb-5 bg-body rounded">
+    <div className="container-fluid">
       {!user && <p className="alert alert-danger text-center">Login To Post</p>}
       {user && <PostForm user={user} posts={posts} setPosts={setPosts} />}
       <PostsCard

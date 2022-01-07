@@ -145,25 +145,19 @@ const addConversation = async (req, res, next) => {
 
 // };
 
-// const deletePost = async (req, res, next) => {
-//   const post = await Post.findOne({ _id: req.params.id });
-//   if (!post) return res.status(400).send("There is no post of specified id");
+const deleteChat = async (req, res, next) => {
+  const conversation = await Message.findOne({ conversation: req.params.id });
+  if (!conversation) return res.status(400).send("There is no messages.");
 
-//   await post.comments.map(
-//     async (comment) => await Comment.deleteOne({ _id: comment._id })
-//   );
+  await Message.deleteMany({ conversation: req.params.id });
 
-//   await Post.deleteOne({ _id: post._id });
-//   if (post.postFile)
-//     fs.unlinkSync(path.join(__dirname, "../public/posts/") + post.postFile);
-
-//   res.status(200).send("Post deleted successfully.");
-// };
+  res.status(200).send("Chat Cleared successfully.");
+};
 
 module.exports = {
   getConversation,
   addConversation,
   //updatePost,
   //   updatePass: updatePass,
-  //deletePost,
+  deleteChat,
 };

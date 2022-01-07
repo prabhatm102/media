@@ -6,12 +6,18 @@ import io from "socket.io-client";
 import {
   getConversations,
   saveConversation,
+  deleteConversation,
 } from "../services/conversationService";
 import { getFriends } from "../services/userService";
 import FriendList from "./friendList";
 import Chat from "./chats.jsx";
 import VideoModal from "./videoModal";
 import auth from "../services/authService";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
+
+const MySwal = withReactContent(Swal);
+
 // import { SocketContext } from "../context/socketContext";
 const socket = io.connect(process.env.REACT_APP_SOCKET_URL);
 
@@ -20,6 +26,9 @@ const Conversation = ({ user }) => {
   const [conversations, setConversations] = useState([]);
   const [receiver, setReceiver] = useState({});
   const [message, setMessage] = useState("");
+  const [wallPaper, setWallPaper] = useState(
+    "https://source.unsplash.com/user/c_v_r/1900x800"
+  );
   // const [userStatus, setUserStatus] = useState([]);
   //............
   const [callAccepted, setCallAccepted] = useState(false);
@@ -155,6 +164,32 @@ const Conversation = ({ user }) => {
   const handleMessage = (msg) => {
     setMessage(msg);
   };
+  const handleClearChat = async (conversationId) => {
+    const allConversations = [...conversations];
+    try {
+      const result = await MySwal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!",
+      });
+      if (result.isConfirmed) {
+        setConversations([]);
+        Swal.fire("Deleted!", "Chat has been Cleared.", "success");
+        await deleteConversation(conversationId);
+      }
+    } catch (ex) {
+      if (ex.response && ex.response.status === 400)
+        toast.warn("There is no chat availabel!");
+      setConversations(allConversations);
+    }
+  };
+  const handleWallPaperChange = (e) => {
+    setWallPaper(URL.createObjectURL(e.files[0]));
+  };
   useEffect(() => {
     const getAllFriends = async () => {
       try {
@@ -215,9 +250,12 @@ const Conversation = ({ user }) => {
               receiver={receiver}
               onSendMessage={handleSendMessage}
               onMessage={handleMessage}
+              onClearChat={handleClearChat}
+              onWallPaperChange={handleWallPaperChange}
               message={message}
               socket={socket}
               callUser={callUser}
+              wallPaper={wallPaper}
             />
           )}
           <VideoModal

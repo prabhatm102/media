@@ -20,10 +20,9 @@ const FriendList = ({ friends, onShowConversation }) => {
                   src={
                     friend && process.env.REACT_APP_USER_IMAGE_URL + friend.file
                   }
-                  className="img-fluid rounded-start img-thumbnail m-2"
+                  className="img-fluid rounded-circle m-2"
                   alt="friend"
-                  height="25"
-                  width="25"
+                  style={{ height: "50px", width: "50px" }}
                 />
                 <strong> {friend.name}</strong>
               </li>

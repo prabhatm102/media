@@ -12,6 +12,7 @@ export default function UserModel({ user, users, setUsers }) {
 
   const [data, setData] = useState({});
   const [errors, setErrors] = useState({});
+  const [imageUrl, setImageUrl] = useState();
   useEffect(() => {
     user &&
       setData({
@@ -66,7 +67,9 @@ export default function UserModel({ user, users, setUsers }) {
         data.file = undefined;
         return;
       }
+
       newData[input.name] = input.files[0];
+      setImageUrl(URL.createObjectURL(input.files[0]));
     } else if (input.type === "checkbox") {
       newData[input.name] = Boolean(input.checked);
     } else newData[input.name] = input.value;
@@ -157,13 +160,35 @@ export default function UserModel({ user, users, setUsers }) {
                     onChange={handleChange}
                     error={errors.password}
                   /> */}
-                <Input
-                  type="file"
-                  label="Profile picture"
-                  name="file"
-                  onChange={handleChange}
-                  error={errors.file}
-                />
+                <div className="form-group offset-3 col-6 my-2">
+                  Profile Picture
+                  <label className="btn">
+                    <span>
+                      {user && (
+                        <div className="text-center m-2">
+                          {" "}
+                          <img
+                            src={
+                              imageUrl ||
+                              process.env.REACT_APP_USER_IMAGE_URL + user.file
+                            }
+                            alt="..."
+                            className="img-fluid img-thumbnail rounded h-75 w-75"
+                          />
+                        </div>
+                      )}
+                    </span>
+                    <input
+                      type="file"
+                      style={{ display: "none" }}
+                      className="form-control"
+                      id="file"
+                      name="file"
+                      onChange={(e) => handleChange(e.currentTarget)}
+                    />
+                  </label>
+                </div>
+
                 <div className="form-check offset-3 col-6 my-2">
                   <input
                     type="checkbox"
@@ -196,6 +221,7 @@ export default function UserModel({ user, users, setUsers }) {
                     type="button"
                     className="btn btn-secondary "
                     data-bs-dismiss="modal"
+                    onClick={() => setImageUrl()}
                   >
                     Cancel
                   </button>

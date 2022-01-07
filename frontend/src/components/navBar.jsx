@@ -76,10 +76,9 @@ const NavBar = ({ user }) => {
                       src={
                         user && process.env.REACT_APP_USER_IMAGE_URL + user.file
                       }
-                      className="img-fluid rounded-start img-thumbnail m-2"
-                      alt="userDetails"
-                      height="25"
-                      width="25"
+                      className="img-fluid rounded-circle m-2"
+                      alt="..."
+                      style={{ height: "30px", width: "30px" }}
                     />
                     {user.name}
                   </NavLink>

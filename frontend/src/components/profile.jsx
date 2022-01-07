@@ -16,6 +16,7 @@ const MySwal = withReactContent(Swal);
 const Profile = () => {
   const [posts, setPosts] = useState([]);
   const [toggleComments, setToggleComments] = useState("none");
+
   const handleComment = (post) => {
     let display;
     if (toggleComments === "none") display = "block";
@@ -65,7 +66,7 @@ const Profile = () => {
   const user = auth.getCurrentUser();
   if (!user) return <Redirect to="/signin" />;
   return (
-    <div className="container-fluid shadow p-3 mb-5 bg-body rounded">
+    <div className="container-fluid">
       <ProfileHeader user={user} />
 
       <PostForm user={user} posts={posts} setPosts={setPosts} />
