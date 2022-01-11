@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Redirect } from "react-router-dom";
 import auth from "../services/authService";
 import { getPosts, deletePost } from "../services/postService";
@@ -11,17 +11,25 @@ import PostsCard from "./postsCard";
 import PostForm from "./postForm";
 import ProfileHeader from "./profileHeader";
 
+//............
+import { PostContext } from "../context/postContext";
+//...........
+
 const MySwal = withReactContent(Swal);
 
 const Profile = () => {
-  const [posts, setPosts] = useState([]);
-  const [toggleComments, setToggleComments] = useState("none");
+  const [posts, setPosts] = useContext(PostContext);
 
   const handleComment = (post) => {
-    let display;
-    if (toggleComments === "none") display = "block";
-    else display = "none";
-    setToggleComments(display);
+    const allPosts = [...posts];
+    const index = allPosts.indexOf(post);
+    allPosts[index] = { ...post };
+    allPosts[index].toggleComments =
+      allPosts[index].toggleComments &&
+      allPosts[index].toggleComments === "block"
+        ? "none"
+        : "block";
+    setPosts(allPosts);
   };
   const handleLike = (post) => {
     const allPosts = [...posts];
@@ -58,27 +66,25 @@ const Profile = () => {
   useEffect(() => {
     const allPosts = async () => {
       const { data } = await getPosts();
-      setPosts(data);
+
+      setPosts(...posts, data);
     };
     if (Object.keys(posts).length === 0) allPosts();
-  }, [posts]);
+  }, []);
 
   const user = auth.getCurrentUser();
   if (!user) return <Redirect to="/signin" />;
   return (
-    <div className="container-fluid">
+    <div className="container-fluid  p-0">
       <ProfileHeader user={user} />
 
-      <PostForm user={user} posts={posts} setPosts={setPosts} />
+      <PostForm user={user} />
 
       <PostsCard
-        posts={posts}
-        setPosts={setPosts}
         onDelete={handleDelete}
         onEdit={handleEdit}
         onComment={handleComment}
         onLike={handleLike}
-        toggleComments={toggleComments}
       />
     </div>
   );

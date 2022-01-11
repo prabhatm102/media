@@ -1,12 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import Joi from "joi-browser";
 import { savePost } from "../services/postService";
-
+import { PostContext } from "../context/postContext";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 const MySwal = withReactContent(Swal);
 
-export default function PostForm({ user, posts, setPosts }) {
+export default function PostForm({ user }) {
+  const [posts, setPosts] = useContext(PostContext);
   const [data, setData] = useState({
     message: "",
     postFile: undefined,
@@ -75,6 +76,7 @@ export default function PostForm({ user, posts, setPosts }) {
       formData.append("postFile", data.postFile);
 
       const response = await savePost(formData);
+
       const prevPosts = [...posts];
       prevPosts.push(response.data);
       setPosts(prevPosts);
@@ -98,31 +100,32 @@ export default function PostForm({ user, posts, setPosts }) {
     <div className="container-fluid">
       <div className="row">
         <div className="col">
-          <div className="post  d-flex">
+          <div className="post-form  d-flex h-100 ">
             <img
               src={process.env.REACT_APP_USER_IMAGE_URL + user.file}
-              className="img-fluid img-thumbnail m-1"
-              alt="userDetails"
-              height="20"
-              width="40"
+              className="img-fluid rounded-pill ms-auto"
+              alt="..."
+              width="45"
             />
             <form
-              className="d-flex"
+              className="d-flex me-auto"
               onSubmit={handleSubmit}
               encType="multipart/form-data"
             >
-              <input
-                type="text"
-                className="form-control me-2"
-                id="message"
-                name="message"
-                value={data.message}
-                onChange={(e) => handleChange(e.currentTarget)}
-              />
-              <div className="form-group m-2">
+              <div className="form-group mx-2">
+                <input
+                  type="text"
+                  className="form-control"
+                  id="message"
+                  name="message"
+                  value={data.message}
+                  onChange={(e) => handleChange(e.currentTarget)}
+                />
+              </div>
+              <div className="form-group">
                 <label className="btn btn-outline-success">
                   <span>
-                    <i className="fa-2x fa fa-file-image-o"></i>
+                    <i className=" fa fa-file-image-o"></i>
                   </span>
                   <input
                     type="file"
@@ -136,11 +139,11 @@ export default function PostForm({ user, posts, setPosts }) {
               </div>
               {data.message.length > 0 && (
                 <button
-                  className="btn btn-outline-primary form-control w-25"
+                  className="btn-sm btn-primary mx-2  m-auto"
                   type="submit"
                   disabled={validate()}
                 >
-                  Post
+                  <i className=" fa fa-paper-plane" aria-hidden="true"></i>
                 </button>
               )}
             </form>

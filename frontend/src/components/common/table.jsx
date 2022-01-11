@@ -4,7 +4,7 @@ import TableHeader from "./tableHeader";
 
 const Table = ({ users, columns }) => {
   return (
-    <table className="table align-middle">
+    <table className="table table-hover table-borderless align-middle">
       <TableHeader columns={columns} />
       <TableBody data={users} columns={columns} />
     </table>

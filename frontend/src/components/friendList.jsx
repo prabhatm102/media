@@ -25,6 +25,9 @@ const FriendList = ({ friends, onShowConversation }) => {
                   style={{ height: "50px", width: "50px" }}
                 />
                 <strong> {friend.name}</strong>
+                {friend.status && (
+                  <span className="mx-5 position-absolute start-50 top-50 p-2 bg-success border border-light rounded-circle translate-middle"></span>
+                )}
               </li>
             ))}
           </ul>

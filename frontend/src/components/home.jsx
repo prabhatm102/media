@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { getAllPosts } from "../services/postService";
 import PostForm from "./postForm";
 import PostsCard from "./postsCard";
+import { PostContext } from "../context/postContext";
 
 const Home = ({ user }) => {
-  const [posts, setPosts] = useState([]);
-  const [toggleComments, setToggleComments] = useState("none");
+  const [posts, setPosts] = useContext(PostContext);
   const handleLike = (post) => {
     const allPosts = [...posts];
     const index = allPosts.indexOf(post);
@@ -14,10 +14,15 @@ const Home = ({ user }) => {
     setPosts(allPosts);
   };
   const handleComment = (post) => {
-    let display;
-    if (toggleComments === "none") display = "block";
-    else display = "none";
-    setToggleComments(display);
+    const allPosts = [...posts];
+    const index = allPosts.indexOf(post);
+    allPosts[index] = { ...post };
+    allPosts[index].toggleComments =
+      allPosts[index].toggleComments &&
+      allPosts[index].toggleComments === "block"
+        ? "none"
+        : "block";
+    setPosts(allPosts);
   };
   useEffect(() => {
     const allPosts = async () => {
@@ -28,16 +33,10 @@ const Home = ({ user }) => {
   }, []);
 
   return (
-    <div className="container-fluid">
+    <div className="container-fluid p-0">
       {!user && <p className="alert alert-danger text-center">Login To Post</p>}
-      {user && <PostForm user={user} posts={posts} setPosts={setPosts} />}
-      <PostsCard
-        posts={posts}
-        setPosts={setPosts}
-        onComment={handleComment}
-        onLike={handleLike}
-        toggleComments={toggleComments}
-      />
+      {user && <PostForm user={user} />}
+      <PostsCard onComment={handleComment} onLike={handleLike} />
     </div>
   );
 };

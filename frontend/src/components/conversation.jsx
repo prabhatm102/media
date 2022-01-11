@@ -1,25 +1,22 @@
-import React, { useState, useEffect, useRef } from "react";
-import Peer from "simple-peer";
+import React, { useState, useEffect, useContext } from "react";
 import { toast } from "react-toastify";
-import io from "socket.io-client";
-// import { socket } from "../context/socketContext";
 import {
   getConversations,
   saveConversation,
   deleteConversation,
 } from "../services/conversationService";
 import { getFriends } from "../services/userService";
+import auth from "../services/authService";
 import FriendList from "./friendList";
 import Chat from "./chats.jsx";
 import VideoModal from "./videoModal";
-import auth from "../services/authService";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 
-const MySwal = withReactContent(Swal);
+import { SocketContext } from "../context/socketContext";
+import { socket } from "../context/socketContext";
 
-// import { SocketContext } from "../context/socketContext";
-const socket = io.connect(process.env.REACT_APP_SOCKET_URL);
+const MySwal = withReactContent(Swal);
 
 const Conversation = ({ user }) => {
   const [friends, setFriends] = useState([]);
@@ -29,108 +26,10 @@ const Conversation = ({ user }) => {
   const [wallPaper, setWallPaper] = useState(
     "https://source.unsplash.com/user/c_v_r/1900x800"
   );
-  // const [userStatus, setUserStatus] = useState([]);
-  //............
-  const [callAccepted, setCallAccepted] = useState(false);
-  const [callEnded, setCallEnded] = useState(false);
-  const [stream, setStream] = useState();
-  // const [name, setName] = useState("");
-  const [call, setCall] = useState({});
-  // const [me, setMe] = useState("");
 
-  const myVideo = useRef();
-  const userVideo = useRef();
-  const connectionRef = useRef();
+  const { answerCall, call, callAccepted, setCall, declineCall, callUser } =
+    useContext(SocketContext);
 
-  useEffect(() => {
-    if (navigator.mediaDevices)
-      navigator.mediaDevices
-        .getUserMedia({ video: true, audio: true })
-        .then((currentStream) => {
-          setStream(currentStream);
-
-          myVideo.current.srcObject = currentStream;
-        })
-        .catch((ex) => console.log(ex));
-
-    // socket.on("me", (id) => setMe(id));
-
-    socket.on("callUser", ({ from, name: callerName, signal }) => {
-      setCall({ isReceivingCall: true, from, name: callerName, signal });
-    });
-  }, []);
-
-  const answerCall = () => {
-    setCallAccepted(true);
-
-    const peer = new Peer({ initiator: false, trickle: false, stream });
-
-    peer.on("signal", (data) => {
-      socket.emit("answerCall", { signal: data, to: call.from });
-    });
-
-    peer.on("stream", (currentStream) => {
-      userVideo.current.srcObject = currentStream;
-    });
-
-    peer.signal(call.signal);
-
-    connectionRef.current = peer;
-  };
-
-  const callUser = (id) => {
-    const peer = new Peer({ initiator: true, trickle: false, stream });
-
-    peer.on("signal", (data) => {
-      socket.emit("callUser", {
-        userToCall: id,
-        signalData: data,
-        from: auth.getCurrentUser()._id,
-        name: auth.getCurrentUser().name,
-      });
-    });
-
-    peer.on("stream", (currentStream) => {
-      userVideo.current.srcObject = currentStream;
-    });
-
-    socket.on("callAccepted", (signal) => {
-      setCallAccepted(true);
-
-      peer.signal(signal);
-    });
-    socket.on("callDeclined", () => {
-      window.location.reload();
-      //  setCallAccepted(false);
-      peer.destroy();
-    });
-
-    connectionRef.current = peer;
-  };
-  const declineCall = () => {
-    socket.emit("declineCall", { to: call.from });
-    window.location.reload();
-  };
-  const leaveCall = () => {
-    setCallEnded(true);
-    socket.emit("declineCall", { to: call.from });
-    window.location.reload();
-    connectionRef.current.destroy();
-  };
-
-  //...............
-  // const {
-  //   answerCall,
-  //   call,
-  //   callAccepted,
-  //   name,
-  //   myVideo,
-  //   userVideo,
-  //   callEnded,
-  //   stream,
-  //   leaveCall,
-  // } = useContext(SocketContext);
-  //..............
   const showConversation = (friend) => {
     const getChats = async () => {
       try {
@@ -205,18 +104,67 @@ const Conversation = ({ user }) => {
 
   useEffect(() => {
     socket.emit("joinRoom", auth.getCurrentUser()._id);
-    // socket.on("userStatus", (data) => {
-    //   console.log(socket);
-    //   setUserStatus([...userStatus, data]);
-    // });
+
     socket.on("receiveMessage", (data) => {
       setConversations([...conversations, data]);
     });
-  }, [conversations]);
+
+    socket.on("userStatus", (data) => {
+      if (friends.length > 0) {
+        const index = friends.findIndex((f) => {
+          return f._id === data.id;
+        });
+        if (index > -1) {
+          friends[index].status = "true";
+          setFriends((friends) => friends);
+        }
+      }
+    });
+  }, [conversations, friends]);
   return (
     <div className="container-fluid">
-      <div className="row">
-        <div className="col-4">
+      {call.isReceivingCall && !callAccepted && (
+        <div className="row mb-2">
+          <div className="col-12">
+            <h1 className="text-center">
+              {call.name} is calling
+              <div
+                className="spinner-grow spinner-grow-sm mx-2"
+                role="status"
+              ></div>
+              <div
+                className="spinner-grow spinner-grow-sm mx-2"
+                role="status"
+              ></div>
+              <div
+                className="spinner-grow spinner-grow-sm mx-2"
+                role="status"
+              ></div>
+            </h1>
+          </div>
+          <div className="col-6 d-flex">
+            <button
+              className="btn btn-sm btn-success ms-auto rounded-circle"
+              data-bs-toggle="modal"
+              data-bs-target="#videoModal"
+              onClick={answerCall}
+            >
+              <i className="fa-3x fa fa-phone" aria-hidden="true"></i>
+            </button>
+          </div>
+          <div className="col-6">
+            <button
+              className="btn btn-sm btn-danger rounded-circle"
+              onClick={declineCall}
+            >
+              <i className="fa-3x fa fa-phone" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div className="row mb-5">
+        <div className="col-md-4 mb-3 p-0">
           {friends.length === 0 && (
             <p>Add new friends from users tab to start chat...</p>
           )}
@@ -227,23 +175,7 @@ const Conversation = ({ user }) => {
             />
           )}
         </div>
-        <div className="col">
-          {call.isReceivingCall && !callAccepted && (
-            <div style={{ display: "flex", justifyContent: "space-around" }}>
-              <h1>{call.name} is calling:</h1>
-              <button
-                className="btn btn-primary"
-                data-bs-toggle="modal"
-                data-bs-target="#videoModal"
-                onClick={answerCall}
-              >
-                Answer
-              </button>
-              <button className="btn btn-danger" onClick={declineCall}>
-                Decline
-              </button>
-            </div>
-          )}
+        <div className="col rounded-4 p-0">
           {receiver._id && (
             <Chat
               conversations={conversations}
@@ -253,21 +185,13 @@ const Conversation = ({ user }) => {
               onClearChat={handleClearChat}
               onWallPaperChange={handleWallPaperChange}
               message={message}
-              socket={socket}
               callUser={callUser}
               wallPaper={wallPaper}
             />
           )}
-          <VideoModal
-            callAccepted={callAccepted}
-            myVideo={myVideo}
-            userVideo={userVideo}
-            callEnded={callEnded}
-            stream={stream}
-            call={call}
-            leaveCall={leaveCall}
-          />
         </div>
+
+        <VideoModal />
       </div>
     </div>
   );

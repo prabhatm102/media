@@ -1,6 +1,6 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useContext } from "react";
 import auth from "../services/authService";
-// import { SocketContext } from "../context/socketContext";
+import { SocketContext } from "../context/socketContext";
 
 const Chat = ({
   conversations,
@@ -10,9 +10,10 @@ const Chat = ({
   onClearChat,
   onWallPaperChange,
   message,
-  callUser,
+
   wallPaper,
 }) => {
+  const { callUser } = useContext(SocketContext);
   const scrollRef = useRef(null);
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -29,7 +30,7 @@ const Chat = ({
   };
 
   return (
-    <div className="chat  border">
+    <div className="chat border border-1">
       <div className="chat-header bg-secondary text-white d-flex">
         <li className="list-group-item-active list-inline m-1">
           <img
@@ -51,8 +52,6 @@ const Chat = ({
           ></i>
           <i
             className=" fa-2x fa fa-ellipsis-v me-3 "
-            aria-hidden="true"
-            style={{ cursor: "pointer" }}
             data-bs-toggle="dropdown"
           ></i>
           <ul className="dropdown-menu">

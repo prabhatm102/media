@@ -1,18 +1,16 @@
-import React from "react";
+import React, { useContext } from "react";
 import auth from "../services/authService";
 import PostForm from "./postComment";
 import Like from "./common/like";
 import Comment from "./common/comment";
+import { PostContext } from "../context/postContext";
 
-export default function PostsCard({
-  posts,
-  setPosts,
-  onDelete,
-  onEdit,
-  onComment,
-  onLike,
-  toggleComments,
-}) {
+export default function PostsCard({ onDelete, onEdit, onComment, onLike }) {
+  let [posts, setPosts] = useContext(PostContext);
+  if (onDelete) {
+    posts = posts.filter((p) => p.user._id === auth.getCurrentUser()._id);
+  }
+
   const getPostTimeStamp = (post) => {
     let createdAt = new Date(post.createdAt).toLocaleString();
     let updatedAt = new Date(post.updatedAt).toLocaleString();
@@ -23,7 +21,7 @@ export default function PostsCard({
     return "Edited " + updatedAt;
   };
   return (
-    <div className="container-fluid card shadow p-3 mb-3 bg-body rounded mt-5">
+    <div className="container-fluid  mb-3  mt-5">
       {posts.length === 0 && (
         <strong className="text-center">There is no posts.....</strong>
       )}
@@ -32,9 +30,9 @@ export default function PostsCard({
           .slice(0)
           .reverse()
           .map((post) => (
-            <div className="row p-0" key={post._id}>
-              <div className="m-auto  col-6 col-sm-* card shadow bg-body rounded p-0 position-relative">
-                <div className="post-content p-0">
+            <div className="row p-0 mt-2" key={post._id}>
+              <div className="m-auto offset-sm-3 col-sm-6 card shadow bg-body rounded p-0 position-relative">
+                <div className="post-content p-0 ">
                   <div className="post-header p-1">
                     {onDelete && (
                       <div className="action float-end">
@@ -94,10 +92,10 @@ export default function PostsCard({
 
                   <Comment
                     onClick={() => onComment(post)}
-                    toggleComments={toggleComments}
+                    toggleComments={post.toggleComments || "none"}
                   />
 
-                  <div style={{ display: toggleComments }}>
+                  <div style={{ display: post.toggleComments || "none" }}>
                     <hr />
                     {post.comments.length === 0 && (
                       <p className="text-center">There is no comment.</p>

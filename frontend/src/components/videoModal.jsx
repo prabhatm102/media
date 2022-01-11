@@ -1,15 +1,9 @@
-import React from "react";
+import React, { useContext } from "react";
+import { SocketContext } from "../context/socketContext";
 
-export default function UserModel({
-  name,
-  callAccepted,
-  myVideo,
-  userVideo,
-  callEnded,
-  stream,
-  call,
-  leaveCall,
-}) {
+export default function UserModel() {
+  const { callAccepted, myVideo, userVideo, callEnded, stream, leaveCall } =
+    useContext(SocketContext);
   return (
     <div>
       <div

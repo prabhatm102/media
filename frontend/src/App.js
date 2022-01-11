@@ -16,7 +16,8 @@ import "./App.css";
 import "react-toastify/dist/ReactToastify.css";
 import React, { useState, useEffect } from "react";
 import CurrentUser from "./context/currentUser";
-// import { ContextProvider } from "./context/socketContext";
+import { PostProvider } from "./context/postContext";
+import { ContextProvider } from "./context/socketContext";
 
 function App() {
   const [user, setUser] = useState();
@@ -27,34 +28,39 @@ function App() {
     <React.Fragment>
       <ToastContainer />
       <NavBar user={user} />
-      <main className="container">
+      <main className="container-fluid p-0">
         <CurrentUser.Provider value={{ currentUser: user, setUser }}>
-          <Switch>
-            <Route path="/signup" component={Signup} />
-            <Route path="/signin" component={Signin} />
-            <Route path="/logout" component={Logout} />
+          <PostProvider>
+            <ContextProvider>
+              <Switch>
+                <Route path="/signup" component={Signup} />
+                <Route path="/signin" component={Signin} />
+                <Route path="/logout" component={Logout} />
 
-            <Route
-              path="/"
-              exact
-              render={(props) => <Home {...props} user={user} />}
-            />
-            <Route
-              path="/profile"
-              render={(props) => <Profile {...props} user={user} />}
-            />
-            {/* <ProtectedRouteAdmin path="/users" component={Users} /> */}
-            <ProtectedRoute path="/users" component={Users} />
-            {/* <ContextProvider> */}
-            <ProtectedRoute
-              path="/conversation"
-              render={(props) => <Conversation {...props} user={user} />}
-            />
-            {/* </ContextProvider> */}
+                <Route
+                  path="/"
+                  exact
+                  render={(props) => <Home {...props} user={user} />}
+                />
+                <Route
+                  path="/profile"
+                  render={(props) => <Profile {...props} user={user} />}
+                />
 
-            <Route path="/notFound" component={NotFound} />
-            <Redirect to="/notFound" />
-          </Switch>
+                {/* <ProtectedRouteAdmin path="/users" component={Users} /> */}
+                <ProtectedRoute path="/users" component={Users} />
+                {/* <ContextProvider> */}
+                <ProtectedRoute
+                  path="/conversation"
+                  render={(props) => <Conversation {...props} user={user} />}
+                />
+                {/* </ContextProvider> */}
+
+                <Route path="/notFound" component={NotFound} />
+                <Redirect to="/notFound" />
+              </Switch>
+            </ContextProvider>
+          </PostProvider>
         </CurrentUser.Provider>
       </main>
     </React.Fragment>

@@ -12,8 +12,8 @@ const Pagination = (props) => {
   const pages = _.range(1, pagesCount + 1);
 
   return (
-    <nav className="offset-4">
-      <ul className="pagination">
+    <nav className="">
+      <ul className="pagination justify-content-center">
         <li className={currentPage === 1 ? "page-item disabled" : "page-item"}>
           <button className="page-link" onClick={() => onPageChange(1)}>
             <span>&laquo;&laquo;</span>

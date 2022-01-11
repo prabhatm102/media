@@ -20,7 +20,8 @@ io.on("connection", (socket) => {
 
   socket.on("joinRoom", (data) => {
     socket.join(data);
-    //   socket.broadcast.emit("userStatus", { id: data, status: true });
+
+    io.emit("userStatus", { id: data, status: true });
   });
 
   socket.on("callUser", ({ userToCall, signalData, from, name }) => {
@@ -37,7 +38,7 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", () => {
     console.log("User disconnected:" + socket.id);
-    // socket.broadcast.emit("userStatus", { id: , status: false });
+    //  io.emit("userStatus", { id: , status: false });
     // socket.broadcast.emit("userStatus", { id: socket.id, status: false });
   });
 });

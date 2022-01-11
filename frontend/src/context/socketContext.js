@@ -4,30 +4,28 @@ import Peer from "simple-peer";
 import auth from "../services/authService";
 
 const SocketContext = createContext();
-
-// const socket = io('http://localhost:5000');
 const socket = io.connect(process.env.REACT_APP_SOCKET_URL);
 export { socket };
 const ContextProvider = ({ children }) => {
   const [callAccepted, setCallAccepted] = useState(false);
   const [callEnded, setCallEnded] = useState(false);
   const [stream, setStream] = useState();
-  const [name, setName] = useState("");
   const [call, setCall] = useState({});
-  // const [me, setMe] = useState("");
 
   const myVideo = useRef();
   const userVideo = useRef();
   const connectionRef = useRef();
 
   useEffect(() => {
-    navigator.mediaDevices
-      .getUserMedia({ video: true, audio: true })
-      .then((currentStream) => {
-        setStream(currentStream);
+    if (navigator.mediaDevices)
+      navigator.mediaDevices
+        .getUserMedia({ video: true, audio: true })
+        .then((currentStream) => {
+          setStream(currentStream);
 
-        myVideo.current.srcObject = currentStream;
-      });
+          myVideo.current.srcObject = currentStream;
+        })
+        .catch((ex) => console.log(ex));
 
     // socket.on("me", (id) => setMe(id));
 
@@ -56,7 +54,7 @@ const ContextProvider = ({ children }) => {
 
   const callUser = (id) => {
     const peer = new Peer({ initiator: true, trickle: false, stream });
-
+    setCall({ from: id });
     peer.on("signal", (data) => {
       socket.emit("callUser", {
         userToCall: id,
@@ -75,18 +73,25 @@ const ContextProvider = ({ children }) => {
 
       peer.signal(signal);
     });
+    socket.on("callDeclined", () => {
+      console.log("vcefvre");
+      window.location.reload();
+      setCallAccepted(false);
+      peer.destroy();
+    });
 
     connectionRef.current = peer;
   };
-
-  const leaveCall = () => {
-    setCallEnded(true);
-
-    connectionRef.current.destroy();
-
+  const declineCall = () => {
+    socket.emit("declineCall", { to: call.from });
     window.location.reload();
   };
-
+  const leaveCall = () => {
+    setCallEnded(true);
+    socket.emit("declineCall", { to: call.from });
+    window.location.reload();
+    connectionRef.current.destroy();
+  };
   return (
     <SocketContext.Provider
       value={{
@@ -95,13 +100,11 @@ const ContextProvider = ({ children }) => {
         myVideo,
         userVideo,
         stream,
-        name,
-        setName,
         callEnded,
-        //  me,
         callUser,
         leaveCall,
         answerCall,
+        declineCall,
       }}
     >
       {children}

@@ -13,7 +13,7 @@ const UserTable = ({ users, onEdit, onDelete, onDetails, onAddFriend }) => {
           height="30"
           width="30"
           alt="user icon"
-          className="img-fluid img-thumbnail"
+          className="img rounded-circle"
         />
       ),
     },
@@ -75,10 +75,8 @@ const UserTable = ({ users, onEdit, onDelete, onDetails, onAddFriend }) => {
   }
 
   return (
-    <div>
-      <div className="table-responsive shadow p-3 mb-5 bg-body rounded">
-        <Table users={users} columns={columns} />
-      </div>
+    <div className="table-responsive table-scrollable shadow m-md-5 p-3 mb-5 bg-body rounded ">
+      <Table users={users} columns={columns} />
     </div>
   );
 };

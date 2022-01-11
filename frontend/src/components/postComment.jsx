@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import Joi from "joi-browser";
 import { saveComment } from "../services/commentService";
 import auth from "../services/authService";
+import { PostContext } from "../context/postContext";
 
-export default function PostForm({ post, posts, setPosts }) {
+export default function PostForm({ post }) {
+  const [posts, setPosts] = useContext(PostContext);
   const user = auth.getCurrentUser();
   const [data, setData] = useState({
     comment: "",
@@ -59,6 +61,7 @@ export default function PostForm({ post, posts, setPosts }) {
   const doSubmit = async () => {
     try {
       const response = await saveComment(data);
+      response.data.toggleComments = "block";
       const prevPosts = [...posts];
       const index = prevPosts.findIndex((p) => p._id === post._id);
       prevPosts[index] = response.data;

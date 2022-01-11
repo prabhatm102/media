@@ -4,7 +4,7 @@ import { NavLink, Link } from "react-router-dom";
 const NavBar = ({ user }) => {
   return (
     <nav
-      className="navbar navbar-expand-lg navbar-light m-2 shadow-sm p-3 mb-5 rounded"
+      className="navbar navbar-expand-lg navbar-light shadow-sm p-3 mb-5 rounded"
       style={{
         backgroundColor: "#e0dfff",
       }}
@@ -76,9 +76,9 @@ const NavBar = ({ user }) => {
                       src={
                         user && process.env.REACT_APP_USER_IMAGE_URL + user.file
                       }
-                      className="img-fluid rounded-circle m-2"
+                      className="img-fluid rounded-circle me-2 my-1"
                       alt="..."
-                      style={{ height: "30px", width: "30px" }}
+                      style={{ height: "30px", width: "33px" }}
                     />
                     {user.name}
                   </NavLink>
@@ -87,19 +87,20 @@ const NavBar = ({ user }) => {
                     className="dropdown-menu w-25"
                     aria-labelledby="dropdownMenuLink"
                   >
-                    <li className="nav-item">
-                      <NavLink className="nav-link  text-center" to="/profile">
+                    <li>
+                      <NavLink
+                        className="dropdown-item  text-center"
+                        to="/profile"
+                      >
                         My Profile
                       </NavLink>
                     </li>
                     <li>
-                      <hr className="dropdown-divider" />
-                    </li>
-                    <li className="nav-item">
                       <NavLink
-                        className="nav-link text-white text-center bg-danger"
+                        className="dropdown-item text-white text-center bg-danger"
                         to="/logout"
                       >
+                        <i className="fa fa-sign-out" aria-hidden="true"></i>
                         Logout
                       </NavLink>
                     </li>
