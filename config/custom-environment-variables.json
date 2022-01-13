@@ -1,5 +1,6 @@
 {
     "jwtPrivateKey":"media_jwtPrivateKey",
     "db":"media_db",
-    "mailPass":"media_mailPass"
+    "mailPass":"media_mailPass",
+    "origin":"media_origin"
 }
