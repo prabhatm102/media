@@ -44,17 +44,17 @@ function App() {
                 />
                 <Route
                   path="/profile"
+                  exact
                   render={(props) => <Profile {...props} user={user} />}
                 />
 
                 {/* <ProtectedRouteAdmin path="/users" component={Users} /> */}
                 <ProtectedRoute path="/users" component={Users} />
-                {/* <ContextProvider> */}
+
                 <ProtectedRoute
                   path="/conversation"
                   render={(props) => <Conversation {...props} user={user} />}
                 />
-                {/* </ContextProvider> */}
 
                 <Route path="/notFound" component={NotFound} />
                 <Redirect to="/notFound" />

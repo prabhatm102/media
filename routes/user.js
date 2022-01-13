@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const {
+  getUserById,
   getUsers,
   addUser,
   getFriends,
@@ -34,7 +35,9 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 router.get("/getFriends", [auth, getFriends]);
+router.get("/:id", validateObjectId, getUserById);
 router.get("/", [auth, getUsers]);
+
 router.post("/", upload.single("file"), validate, addUser);
 router.post("/sendmail", validateEmail, sendMail);
 

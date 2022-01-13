@@ -2,6 +2,9 @@ import http from "./httpServices";
 
 const apiEndpoint = "/users";
 
+export const getUserById = (userId) => {
+  return http.get(apiEndpoint + "/" + userId);
+};
 export const getUsers = () => {
   return http.get(apiEndpoint);
 };

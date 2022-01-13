@@ -9,6 +9,11 @@ const fs = require("fs");
 const path = require("path");
 const winston = require("winston");
 
+const getUserById = async (req, res, next) => {
+  const user = await User.findOne({ _id: req.params.id }).select("name file");
+  res.status(200).send(user);
+};
+
 const getUsers = async (req, res, next) => {
   const users = await User.find({}).select(" -__v");
   res.status(200).send(users);
@@ -242,12 +247,13 @@ const sendMail = async (req, res, next) => {
 };
 
 module.exports = {
-  getUsers: getUsers,
-  addUser: addUser,
+  getUserById,
+  getUsers,
+  addUser,
   addFriend,
   getFriends,
-  updateUser: updateUser,
-  updatePass: updatePass,
-  deleteUser: deleteUser,
-  sendMail: sendMail,
+  updateUser,
+  updatePass,
+  deleteUser,
+  sendMail,
 };

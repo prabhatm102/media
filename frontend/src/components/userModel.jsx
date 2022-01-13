@@ -12,18 +12,15 @@ export default function UserModel({ user, users, setUsers }) {
 
   const [data, setData] = useState({});
   const [errors, setErrors] = useState({});
-  const [imageUrl, setImageUrl] = useState();
+  const [imageUrl, setImageUrl] = useState("");
   useEffect(() => {
-    user &&
-      setData({
-        //  _id: user._id,
-        name: user.name,
-        email: user.email,
-        //    password: user.password,
-        file: "",
-        isActive: user.isActive,
-        isAdmin: user.isAdmin,
-      });
+    setData({
+      name: user.name,
+      email: user.email,
+      file: "",
+      isActive: user.isActive,
+      isAdmin: user.isAdmin,
+    });
   }, [user]);
 
   const schema = {
@@ -125,121 +122,111 @@ export default function UserModel({ user, users, setUsers }) {
   };
 
   return (
-    <div>
-      <div
-        className="modal fade"
-        id="updateUser"
-        tabIndex="-1"
-        aria-labelledby="updateUserLabel"
-        aria-hidden="true"
-      >
-        <div className="modal-dialog">
-          <div className="modal-content">
-            <ModalHeader title="Update User" />
-            <div className="modal-body">
-              <form onSubmit={handleSubmit} encType="multipart/form-data">
-                <Input
-                  type="text"
-                  label="Name"
-                  name="name"
-                  value={data.name}
-                  onChange={handleChange}
-                  error={errors.name}
-                />
-                <Input
-                  type="email"
-                  label="Email"
-                  name="email"
-                  value={data.email}
-                  onChange={handleChange}
-                  error={errors.email}
-                />
-                {/* <Input
-                    type="password"
-                    label="Password"
-                    name="password"
-                    value={data.password}
-                    onChange={handleChange}
-                    error={errors.password}
-                  /> */}
-                <div className="form-group offset-3 col-6 my-2">
-                  Profile Picture
-                  <label className="btn">
-                    <span>
-                      {user && (
-                        <div className="text-center m-2">
-                          {" "}
-                          <img
-                            src={
-                              imageUrl ||
-                              process.env.REACT_APP_USER_IMAGE_URL + user.file
-                            }
-                            alt="..."
-                            className="img-fluid img-thumbnail rounded h-75 w-75"
-                          />
-                        </div>
-                      )}
-                    </span>
-                    <input
-                      type="file"
-                      style={{ display: "none" }}
-                      className="form-control"
-                      id="file"
-                      name="file"
-                      onChange={(e) => handleChange(e.currentTarget)}
-                    />
-                  </label>
-                </div>
-
-                <div className="form-check offset-3 col-6 my-2">
+    <div
+      className="modal fade"
+      id="updateUser"
+      tabIndex="-1"
+      aria-labelledby="updateUserLabel"
+      aria-hidden="true"
+    >
+      <div className="modal-dialog modal-dialog-scrollable ">
+        <div className="modal-content">
+          <ModalHeader title="Update User" />
+          <div className="modal-body">
+            <form onSubmit={handleSubmit} encType="multipart/form-data">
+              <Input
+                type="text"
+                label="Name"
+                name="name"
+                value={data.name}
+                onChange={handleChange}
+                error={errors.name}
+              />
+              <Input
+                type="email"
+                label="Email"
+                name="email"
+                value={data.email}
+                onChange={handleChange}
+                error={errors.email}
+              />
+              <div className="form-group offset-3 col-6 my-2">
+                Profile Picture
+                <label className="btn">
+                  <span>
+                    {(user.file || imageUrl) && (
+                      <div className="text-center m-2">
+                        {" "}
+                        <img
+                          src={
+                            imageUrl ||
+                            process.env.REACT_APP_USER_IMAGE_URL + user.file
+                          }
+                          alt="..."
+                          className="img-fluid img-thumbnail rounded h-75 w-75"
+                        />
+                      </div>
+                    )}
+                  </span>
                   <input
-                    type="checkbox"
-                    label="Active"
-                    id="isActive"
-                    name="isActive"
+                    type="file"
+                    style={{ display: "none" }}
+                    className="form-control"
+                    id="file"
+                    name="file"
                     onChange={(e) => handleChange(e.currentTarget)}
-                    checked={data.isActive}
-                    className="form-check-input"
                   />
-                  <label className="form-check-label">isActive</label>
-                </div>
-                {currentUserContext.currentUser &&
-                  currentUserContext.currentUser.isAdmin && (
-                    <div className="form-check offset-3 col-6 my-2">
-                      <input
-                        type="checkbox"
-                        label="Admin"
-                        name="isAdmin"
-                        id="isAdmin"
-                        onChange={(e) => handleChange(e.currentTarget)}
-                        checked={data.isAdmin}
-                        className="form-check-input"
-                      />
-                      <label className="form-check-label" htmlFor="">
-                        isAdmin
-                      </label>
-                    </div>
-                  )}
-                <div className="offset-3 col-6 my-2">
-                  <button
-                    type="button"
-                    className="btn btn-secondary "
-                    data-bs-dismiss="modal"
-                    onClick={() => setImageUrl()}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="btn btn-primary mx-3"
-                    disabled={validate()}
-                    data-bs-dismiss="modal"
-                  >
-                    Update
-                  </button>
-                </div>
-              </form>
-            </div>
+                </label>
+              </div>
+
+              <div className="form-check offset-3 col-6  my-2">
+                <input
+                  type="checkbox"
+                  label="Active"
+                  id="isActive"
+                  name="isActive"
+                  onChange={(e) => handleChange(e.currentTarget)}
+                  checked={data.isActive}
+                  className="form-check-input"
+                />
+                <label className="form-check-label">isActive</label>
+              </div>
+              {currentUserContext.currentUser &&
+                currentUserContext.currentUser.isAdmin && (
+                  <div className="form-check offset-3 col-6 my-2">
+                    <input
+                      type="checkbox"
+                      label="Admin"
+                      name="isAdmin"
+                      id="isAdmin"
+                      onChange={(e) => handleChange(e.currentTarget)}
+                      checked={data.isAdmin}
+                      className="form-check-input"
+                    />
+                    <label className="form-check-label" htmlFor="">
+                      isAdmin
+                    </label>
+                  </div>
+                )}
+              <div className="offset-3 col-6 my-2">
+                <button
+                  type="button"
+                  className="btn btn-sm btn-secondary  me-2  mb-2"
+                  data-bs-dismiss="modal"
+                  onClick={() => setImageUrl()}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-sm btn-primary mb-2"
+                  disabled={validate()}
+                  data-bs-dismiss="modal"
+                >
+                  Update
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       </div>

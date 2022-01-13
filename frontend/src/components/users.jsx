@@ -14,7 +14,7 @@ const MySwal = withReactContent(Swal);
 
 const Users = () => {
   const [users, setUsers] = useState([]);
-  const [user, setUser] = useState();
+  const [user, setUser] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(4);
   const [totalCount, setTotalCount] = useState(0);
