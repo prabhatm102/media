@@ -201,21 +201,23 @@ export default function UserModel({ user, users, setUsers }) {
                   />
                   <label className="form-check-label">isActive</label>
                 </div>
-                <div className="form-check offset-3 col-6 my-2">
-                  <input
-                    type="checkbox"
-                    label="Admin"
-                    name="isAdmin"
-                    id="isAdmin"
-                    onChange={(e) => handleChange(e.currentTarget)}
-                    checked={data.isAdmin}
-                    className="form-check-input"
-                  />
-                  <label className="form-check-label" htmlFor="">
-                    isAdmin
-                  </label>
-                </div>
-
+                {currentUserContext.currentUser &&
+                  currentUserContext.currentUser.isAdmin && (
+                    <div className="form-check offset-3 col-6 my-2">
+                      <input
+                        type="checkbox"
+                        label="Admin"
+                        name="isAdmin"
+                        id="isAdmin"
+                        onChange={(e) => handleChange(e.currentTarget)}
+                        checked={data.isAdmin}
+                        className="form-check-input"
+                      />
+                      <label className="form-check-label" htmlFor="">
+                        isAdmin
+                      </label>
+                    </div>
+                  )}
                 <div className="offset-3 col-6 my-2">
                   <button
                     type="button"

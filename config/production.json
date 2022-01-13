@@ -1,5 +1,6 @@
 {
     "jwtPrivateKey":"",
     "db":"",
-    "mailPass":""
+    "mailPass":"",
+    "origin":"https://mediarudra.netlify.in"
 }

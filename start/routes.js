@@ -17,7 +17,12 @@ const conversation = require("../routes/conversation");
 const path = require("path");
 
 module.exports = function (app) {
-  app.use(cors());
+  var corsOptions = {
+    origin: process.env.origin || "*",
+    optionsSuccessStatus: 200,
+  };
+
+  app.use(cors(corsOptions));
   app.use(express.static("public/"));
   app.use(favicon("public/favicon/favicon.ico"));
   app.use(express.json());
