@@ -109,10 +109,12 @@ export default function UserModel({ user, users, setUsers }) {
         auth.loginWithJwt(res.headers["x-auth-token"]);
         currentUserContext.setUser(res.data);
       }
+
       const allUsers = [...users];
       const index = allUsers.indexOf(user);
       allUsers[index] = { ...res.data };
       setUsers(allUsers);
+      setImageUrl();
     } catch (ex) {
       if (ex.response && ex.response.status === 409) {
         const errorMessage = { ...errors };

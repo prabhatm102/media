@@ -18,7 +18,7 @@ const path = require("path");
 
 module.exports = function (app) {
   var corsOptions = {
-    origin: process.env.origin || "*",
+    origin: process.env.origin || "http://localhost:3000",
     optionsSuccessStatus: 200,
   };
 
