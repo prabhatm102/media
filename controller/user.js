@@ -188,8 +188,11 @@ const deleteUser = async (req, res, next) => {
   await User.deleteOne({ _id: user._id });
   await Post.deleteMany({ user: user._id });
   await Comment.deleteMany({ user: user._id });
-
-  fs.unlinkSync(path.join(__dirname, "../public/uploads/") + user.file);
+  try {
+    fs.unlinkSync(path.join(__dirname, "../public/uploads/") + user.file);
+  } catch (ex) {
+    winston.info("User image has already been deleted!");
+  }
   // const decoded = jwt.verify(
   //   req.cookies.authToken,
   //   config.get("jwtPrivateKey")

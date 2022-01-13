@@ -3,6 +3,7 @@ const { Comment } = require("../model/comment");
 const { User } = require("../model/user");
 const fs = require("fs");
 const path = require("path");
+const winston = require("winston");
 
 const getPostsById = async (req, res, next) => {
   const posts = await Post.find({ user: req.params.id })
@@ -118,8 +119,12 @@ const deletePost = async (req, res, next) => {
   );
 
   await Post.deleteOne({ _id: post._id });
-  if (post.postFile)
-    fs.unlinkSync(path.join(__dirname, "../public/posts/") + post.postFile);
+  try {
+    if (post.postFile)
+      fs.unlinkSync(path.join(__dirname, "../public/posts/") + post.postFile);
+  } catch (ex) {
+    winston.info("Post image has already been deleted!");
+  }
 
   res.status(200).send("Post deleted successfully.");
 };
