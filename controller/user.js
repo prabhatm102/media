@@ -7,7 +7,7 @@ const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 const fs = require("fs");
 const path = require("path");
-const winston = require("winston/lib/winston/config");
+const winston = require("winston");
 
 const getUsers = async (req, res, next) => {
   const users = await User.find({}).select(" -__v");
@@ -68,7 +68,7 @@ const updateUser = async (req, res, next) => {
       try {
         fs.unlinkSync(path.join(__dirname, "../public/uploads/") + user.file);
       } catch (ex) {
-        winston.info("Image already deleted!");
+        winston.info("Image has already been deleted!");
       }
     }
 
