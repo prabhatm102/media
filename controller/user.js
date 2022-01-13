@@ -86,7 +86,7 @@ const updateUser = async (req, res, next) => {
     fs.unlinkSync(
       path.join(__dirname, "../public/uploads/") + req.file.filename
     );
-    return res.status(401).send("Unauthorised");
+    return res.status(401).send(ex.message);
   }
 };
 const getFriends = async (req, res) => {
