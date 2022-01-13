@@ -7,6 +7,7 @@ const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 const fs = require("fs");
 const path = require("path");
+const winston = require("winston/lib/winston/config");
 
 const getUsers = async (req, res, next) => {
   const users = await User.find({}).select(" -__v");
@@ -63,8 +64,13 @@ const updateUser = async (req, res, next) => {
       { new: true }
     );
 
-    if (req.file)
-      fs.unlinkSync(path.join(__dirname, "../public/uploads/") + user.file);
+    if (req.file) {
+      try {
+        fs.unlinkSync(path.join(__dirname, "../public/uploads/") + user.file);
+      } catch (ex) {
+        winston.info("Image already deleted!");
+      }
+    }
 
     if (req.user.isAdmin && req.params.id !== req.user._id) {
       return res.status(202).send(result);
@@ -80,7 +86,7 @@ const updateUser = async (req, res, next) => {
     fs.unlinkSync(
       path.join(__dirname, "../public/uploads/") + req.file.filename
     );
-    return res.status(401).send(ex.message);
+    return res.status(401).send("Unauthorised");
   }
 };
 const getFriends = async (req, res) => {
