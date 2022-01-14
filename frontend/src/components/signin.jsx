@@ -1,10 +1,12 @@
 import auth from "../services/authService";
 import { Redirect } from "react-router-dom";
 import Joi from "joi-browser";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
+import CurrentUser from "../context/currentUser";
 import Input from "./common/input";
 
 const Signin = (props) => {
+  const { setUser } = useContext(CurrentUser);
   const [data, setData] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
 
@@ -55,7 +57,8 @@ const Signin = (props) => {
     try {
       await auth.login(data.email, data.password);
       const { state } = props.location;
-      window.location = state ? state.from.pathname : "/";
+      setUser(auth.getCurrentUser());
+      return <Redirect to={state ? state.from.pathname : "/"} />;
     } catch (ex) {
       if (ex.response && ex.response.status === 400) {
         const errorMessage = { ...errors };

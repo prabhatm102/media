@@ -65,7 +65,7 @@ const Profile = () => {
   };
   useEffect(() => {
     const allPosts = async () => {
-      const { data } = await getPosts();
+      const { data } = await getPosts(user._id);
 
       setPosts(...posts, data);
     };

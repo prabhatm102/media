@@ -92,7 +92,7 @@ const Conversation = ({ user }) => {
   useEffect(() => {
     const getAllFriends = async () => {
       try {
-        const { data } = await getFriends();
+        const { data } = await getFriends(auth.getCurrentUser()._id);
         setFriends(data);
       } catch (ex) {
         if (ex.response && ex.response.status === 400) toast.error(ex.message);

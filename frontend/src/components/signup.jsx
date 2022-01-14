@@ -1,12 +1,14 @@
 import Joi from "joi-browser";
-import React from "react";
+import React, { useContext } from "react";
 import { Redirect } from "react-router-dom";
 import useForm from "../hooks/useForm";
 import auth from "../services/authService";
 import { saveUser } from "../services/userService";
 import Input from "./common/input";
+import CurrentUser from "../context/currentUser";
 
 const Signup = () => {
+  const { setUser } = useContext(CurrentUser);
   const schema = {
     name: Joi.string().required().min(3).label("Name"),
     email: Joi.string().email().required().label("Email"),
@@ -23,7 +25,8 @@ const Signup = () => {
 
       const response = await saveUser(formData);
       auth.loginWithJwt(response.headers["x-auth-token"]);
-      window.location = "/";
+      setUser(auth.getCurrentUser());
+      return <Redirect to={"/"} />;
     } catch (ex) {
       if (ex.response && ex.response.status === 409) {
         const errorMessage = { ...errors };

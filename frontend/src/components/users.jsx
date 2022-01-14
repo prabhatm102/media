@@ -30,15 +30,18 @@ const Users = () => {
   const handleAddFriend = async (user) => {
     try {
       const allUsers = [...users];
-      const index = allUsers.findIndex(
-        (u) => u._id === auth.getCurrentUser()._id
+      const index = allUsers.findIndex((u) => u._id === user._id);
+      const friendIndex = allUsers[index].friends.indexOf(
+        auth.getCurrentUser()._id
       );
-      const friendIndex = allUsers[index].friends.indexOf(user._id);
 
-      if (friendIndex === -1) allUsers[index].friends.push(user._id);
+      if (friendIndex === -1)
+        allUsers[index].friends.push(auth.getCurrentUser()._id);
       else {
         const friends = [...allUsers[index].friends];
-        const updatedFriends = friends.filter((f) => f !== user._id);
+        const updatedFriends = friends.filter(
+          (f) => f !== auth.getCurrentUser()._id
+        );
         allUsers[index].friends = updatedFriends;
       }
 

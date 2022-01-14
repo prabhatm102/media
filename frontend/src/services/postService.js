@@ -6,9 +6,10 @@ const apiEndpoint = "/posts";
 export const getAllPosts = () => {
   return http.get(apiEndpoint);
 };
-export const getPosts = () => {
-  return http.get(apiEndpoint + "/" + auth.getCurrentUser()._id);
+export const getPosts = (userId) => {
+  return http.get(apiEndpoint + "/" + userId);
 };
+
 export const savePost = (post) => {
   return http.post(apiEndpoint + "/" + auth.getCurrentUser()._id, post, {
     headers: { "Content-Type": "multipart/form-data" },

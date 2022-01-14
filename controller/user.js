@@ -10,7 +10,9 @@ const path = require("path");
 const winston = require("winston");
 
 const getUserById = async (req, res, next) => {
-  const user = await User.findOne({ _id: req.params.id }).select("name file");
+  const user = await User.findOne({ _id: req.params.id }).select(
+    "name file friends"
+  );
   res.status(200).send(user);
 };
 
@@ -95,7 +97,7 @@ const updateUser = async (req, res, next) => {
   }
 };
 const getFriends = async (req, res) => {
-  const allFriends = await User.findOne({ _id: req.user._id })
+  const allFriends = await User.findOne({ _id: req.params.id })
     .populate("friends", "_id name file")
     .select("-_id friends");
 

@@ -1,4 +1,5 @@
 import React, { useState, useContext } from "react";
+import { Link } from "react-router-dom";
 import Joi from "joi-browser";
 import { savePost } from "../services/postService";
 import { PostContext } from "../context/postContext";
@@ -100,13 +101,15 @@ export default function PostForm({ user }) {
     <div className="container-fluid">
       <div className="row">
         <div className="col">
-          <div className="post-form  d-flex h-100 ">
-            <img
-              src={process.env.REACT_APP_USER_IMAGE_URL + user.file}
-              className="img-fluid rounded-pill ms-auto"
-              alt="..."
-              width="45"
-            />
+          <div className="post-form  d-flex h-100">
+            <Link to="/profile/" className=" ms-auto">
+              <img
+                src={process.env.REACT_APP_USER_IMAGE_URL + user.file}
+                className="img-fluid rounded-pill"
+                alt="..."
+                width="45"
+              />
+            </Link>
             <form
               className="d-flex me-auto"
               onSubmit={handleSubmit}

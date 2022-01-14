@@ -1,20 +1,29 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import auth from "../services/authService";
 import Table from "./common/table";
 import AddFriend from "./common/addFriend";
 const UserTable = ({ users, onEdit, onDelete, onDetails, onAddFriend }) => {
-  const currentUser = users.find((u) => u._id === auth.getCurrentUser()._id);
   const columns = [
     {
       key: "file",
       content: (user) => (
-        <img
-          src={process.env.REACT_APP_USER_IMAGE_URL + user.file}
-          height="30"
-          width="30"
-          alt="user icon"
-          className="img rounded-circle"
-        />
+        <Link
+          to={
+            "/profile/" +
+            (user._id !== (auth.getCurrentUser() && auth.getCurrentUser()._id)
+              ? user._id
+              : "")
+          }
+        >
+          <img
+            src={process.env.REACT_APP_USER_IMAGE_URL + user.file}
+            height="30"
+            width="30"
+            alt="user icon"
+            className="img rounded-circle"
+          />
+        </Link>
       ),
     },
     { path: "name", label: "Name" },
@@ -27,8 +36,8 @@ const UserTable = ({ users, onEdit, onDelete, onDetails, onAddFriend }) => {
         <AddFriend
           onClick={() => onAddFriend(user)}
           friend={
-            currentUser
-              ? currentUser.friends.indexOf(user._id) === -1
+            auth.getCurrentUser()
+              ? user.friends.indexOf(auth.getCurrentUser()._id) === -1
                 ? false
                 : true
               : false

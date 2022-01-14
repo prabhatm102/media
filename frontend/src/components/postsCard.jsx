@@ -1,14 +1,23 @@
 import React, { useContext } from "react";
+import { Link } from "react-router-dom";
 import auth from "../services/authService";
 import PostForm from "./postComment";
 import Like from "./common/like";
 import Comment from "./common/comment";
 import { PostContext } from "../context/postContext";
 
-export default function PostsCard({ onDelete, onEdit, onComment, onLike }) {
+export default function PostsCard({
+  onDelete,
+  onEdit,
+  onComment,
+  onLike,
+  userId,
+}) {
   let [posts, setPosts] = useContext(PostContext);
-  if (onDelete) {
-    posts = posts.filter((p) => p.user._id === auth.getCurrentUser()._id);
+  if (onDelete || userId) {
+    posts = posts.filter(
+      (p) => p.user._id === (userId ? userId : auth.getCurrentUser()._id)
+    );
   }
 
   const getPostTimeStamp = (post) => {
@@ -48,19 +57,30 @@ export default function PostsCard({ onDelete, onEdit, onComment, onLike }) {
                         />
                       </div>
                     )}
+
                     <div className="card-title d-flex p-0">
                       <div className="profile-image">
-                        <img
-                          src={
-                            post &&
-                            process.env.REACT_APP_USER_IMAGE_URL +
-                              post.user.file
+                        <Link
+                          to={
+                            "/profile/" +
+                            (post.user._id !==
+                            (auth.getCurrentUser() && auth.getCurrentUser()._id)
+                              ? post.user._id
+                              : "")
                           }
-                          className="img-fluid rounded-pill my-1"
-                          alt="not found"
-                          height="55"
-                          width="55"
-                        />
+                        >
+                          <img
+                            src={
+                              post &&
+                              process.env.REACT_APP_USER_IMAGE_URL +
+                                post.user.file
+                            }
+                            className="img-fluid rounded-pill my-1"
+                            alt="not found"
+                            height="55"
+                            width="55"
+                          />
+                        </Link>
                       </div>
                       <div
                         className="profile-content rounded-3 p-2 w-75"

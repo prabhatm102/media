@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useContext } from "react";
+import { Link } from "react-router-dom";
 import auth from "../services/authService";
 import { SocketContext } from "../context/socketContext";
 
@@ -33,12 +34,14 @@ const Chat = ({
     <div className="chat border border-1">
       <div className="chat-header bg-secondary text-white d-flex">
         <li className="list-group-item-active list-inline m-1">
-          <img
-            src={process.env.REACT_APP_USER_IMAGE_URL + receiver.file}
-            className="img-fluid rounded-circle m-2"
-            alt="friend"
-            style={{ height: "40px", width: "40px", cursor: "pointer" }}
-          />
+          <Link to={"/profile/" + receiver._id}>
+            <img
+              src={process.env.REACT_APP_USER_IMAGE_URL + receiver.file}
+              className="img-fluid rounded-circle m-2"
+              alt="friend"
+              style={{ height: "40px", width: "40px", cursor: "pointer" }}
+            />
+          </Link>
           <strong> {receiver.name}</strong>{" "}
         </li>
         <div className="mt-3 ms-auto dropstart">

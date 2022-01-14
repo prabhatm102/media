@@ -27,8 +27,8 @@ export const deleteUser = (user) => {
   return http.delete(apiEndpoint + "/" + user._id);
 };
 
-export const getFriends = () => {
-  return http.get(apiEndpoint + "/getFriends");
+export const getFriends = (userId) => {
+  return http.get(apiEndpoint + "/getFriends/" + userId);
 };
 export const addFriend = (friend) => {
   return http.put(apiEndpoint + "/addFriend", { friend: friend._id });

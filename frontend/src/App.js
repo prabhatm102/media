@@ -4,6 +4,7 @@ import auth from "./services/authService";
 import NavBar from "./components/navBar";
 import Home from "./components/home";
 import Profile from "./components/profile";
+import UserProfile from "./components/userProfile";
 import Users from "./components/users";
 import Conversation from "./components/conversation";
 import Signup from "./components/signup";
@@ -20,7 +21,7 @@ import { PostProvider } from "./context/postContext";
 import { ContextProvider } from "./context/socketContext";
 
 function App() {
-  const [user, setUser] = useState();
+  const [user, setUser] = useState("");
   useEffect(() => {
     setUser(auth.getCurrentUser());
   }, []);
@@ -46,6 +47,11 @@ function App() {
                   path="/profile"
                   exact
                   render={(props) => <Profile {...props} user={user} />}
+                />
+                <Route
+                  path="/profile/:id"
+                  exact
+                  render={(props) => <UserProfile {...props} user={user} />}
                 />
 
                 {/* <ProtectedRouteAdmin path="/users" component={Users} /> */}

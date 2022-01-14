@@ -25,7 +25,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-router.get("/:id", [auth, getPostsById]);
+router.get("/:id", [getPostsById]);
 router.get("/", [getPosts]);
 router.post(
   "/:id",

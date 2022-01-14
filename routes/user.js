@@ -34,7 +34,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-router.get("/getFriends", [auth, getFriends]);
+router.get("/getFriends/:id", [auth, validateObjectId, getFriends]);
 router.get("/:id", validateObjectId, getUserById);
 router.get("/", [auth, getUsers]);
 
