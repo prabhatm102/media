@@ -19,6 +19,7 @@ import React, { useState, useEffect } from "react";
 import CurrentUser from "./context/currentUser";
 import { PostProvider } from "./context/postContext";
 import { ContextProvider } from "./context/socketContext";
+import { UsersProvider } from "./context/usersContext";
 
 function App() {
   const [user, setUser] = useState("");
@@ -33,38 +34,40 @@ function App() {
         <CurrentUser.Provider value={{ currentUser: user, setUser }}>
           <PostProvider>
             <ContextProvider>
-              <Switch>
-                <Route path="/signup" component={Signup} />
-                <Route path="/signin" component={Signin} />
-                <Route path="/logout" component={Logout} />
+              <UsersProvider>
+                <Switch>
+                  <Route path="/signup" component={Signup} />
+                  <Route path="/signin" component={Signin} />
+                  <Route path="/logout" component={Logout} />
 
-                <Route
-                  path="/"
-                  exact
-                  render={(props) => <Home {...props} user={user} />}
-                />
-                <Route
-                  path="/profile"
-                  exact
-                  render={(props) => <Profile {...props} user={user} />}
-                />
-                <Route
-                  path="/profile/:id"
-                  exact
-                  render={(props) => <UserProfile {...props} user={user} />}
-                />
+                  <Route
+                    path="/"
+                    exact
+                    render={(props) => <Home {...props} user={user} />}
+                  />
+                  <Route
+                    path="/profile"
+                    exact
+                    render={(props) => <Profile {...props} user={user} />}
+                  />
+                  <Route
+                    path="/profile/:id"
+                    exact
+                    render={(props) => <UserProfile {...props} user={user} />}
+                  />
 
-                {/* <ProtectedRouteAdmin path="/users" component={Users} /> */}
-                <ProtectedRoute path="/users" component={Users} />
+                  {/* <ProtectedRouteAdmin path="/users" component={Users} /> */}
+                  <ProtectedRoute path="/users" component={Users} />
 
-                <ProtectedRoute
-                  path="/conversation"
-                  render={(props) => <Conversation {...props} user={user} />}
-                />
+                  <ProtectedRoute
+                    path="/conversation"
+                    render={(props) => <Conversation {...props} user={user} />}
+                  />
 
-                <Route path="/notFound" component={NotFound} />
-                <Redirect to="/notFound" />
-              </Switch>
+                  <Route path="/notFound" component={NotFound} />
+                  <Redirect to="/notFound" />
+                </Switch>
+              </UsersProvider>
             </ContextProvider>
           </PostProvider>
         </CurrentUser.Provider>

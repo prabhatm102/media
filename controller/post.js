@@ -12,7 +12,7 @@ const getPostsById = async (req, res, next) => {
       path: "comments",
       populate: { path: "user", select: "name _id file" },
     })
-    .select(" -__v");
+    .select("-__v");
 
   const imageUrl =
     req.protocol + "://" + path.join(req.headers.host, "/posts/");
@@ -31,7 +31,7 @@ const getPosts = async (req, res, next) => {
       path: "comments",
       populate: { path: "user", select: "name _id file" },
     })
-    .select(" -__v");
+    .select("-__v");
 
   const imageUrl =
     req.protocol + "://" + path.join(req.headers.host, "/posts/");
@@ -129,6 +129,35 @@ const deletePost = async (req, res, next) => {
   res.status(200).send("Post deleted successfully.");
 };
 
+const toggleLike = async (req, res, next) => {
+  const user = await User.findOne({ _id: req.user._id });
+  if (!user) return res.status(400).send("There is no user of given id!");
+
+  const post = await Post.findOne({ _id: req.body.post });
+  if (!post) return res.status(400).send("There is no post.");
+
+  const isLiked = post.likes.find((p) => p.toString() === user._id.toString());
+
+  if (isLiked) {
+    const likedList = post.likes.filter(
+      (p) => p.toString() !== user._id.toString()
+    );
+
+    post.likes = likedList;
+
+    await post.save();
+    return res.status(200).send("Post Like removed successfully");
+  }
+
+  try {
+    post.likes.push(user._id);
+    await post.save();
+    res.status(200).send("Post Liked successfully");
+  } catch (ex) {
+    return res.status(400).send(ex.message);
+  }
+};
+
 module.exports = {
   getPostsById,
   getPosts,
@@ -136,4 +165,5 @@ module.exports = {
   //updatePost,
   //   updatePass: updatePass,
   deletePost,
+  toggleLike,
 };

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { toast } from "react-toastify";
 import { getUsers, deleteUser, addFriend } from "../services/userService";
 import UserTable from "./userTable";
@@ -8,12 +8,13 @@ import { paginate } from "../utils/paginate";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import auth from "../services/authService";
+import { AllUser } from "../context/usersContext";
 // import auth from "../services/authService";
 
 const MySwal = withReactContent(Swal);
 
 const Users = () => {
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useContext(AllUser);
   const [user, setUser] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(4);

@@ -1,10 +1,11 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import auth from "../services/authService";
 import PostForm from "./postComment";
 import Like from "./common/like";
 import Comment from "./common/comment";
 import { PostContext } from "../context/postContext";
+import LikedByModal from "./likedByModal";
 
 export default function PostsCard({
   onDelete,
@@ -14,6 +15,8 @@ export default function PostsCard({
   userId,
 }) {
   let [posts, setPosts] = useContext(PostContext);
+  let [post, setPost] = useState();
+
   if (onDelete || userId) {
     posts = posts.filter(
       (p) => p.user._id === (userId ? userId : auth.getCurrentUser()._id)
@@ -28,6 +31,9 @@ export default function PostsCard({
     }
 
     return "Edited " + updatedAt;
+  };
+  const showLikedBy = (post) => {
+    setPost(post);
   };
   return (
     <div className="container-fluid  mb-3  mt-5">
@@ -106,9 +112,33 @@ export default function PostsCard({
                     />
                   )}
                 </div>
+                {post.likes.length > 0 && (
+                  <span className="mt-3 m-1 mb-0  ">
+                    <i
+                      // onClick={onClick}
+                      className="fa fa-thumbs-up text-white bg-primary p-1 rounded-circle"
+                      style={{ cursor: "pointer" }}
+                      onClick={() => showLikedBy(post)}
+                      data-bs-toggle="modal"
+                      data-bs-target="#likedByModal"
+                    ></i>
+                    <span className="mx-1 text-muted">{post.likes.length}</span>
+                  </span>
+                )}
                 <hr />
                 <div className="post-footer bg-white mb-3 mx-3">
-                  <Like onClick={() => onLike(post)} liked={post.liked} />
+                  <Like
+                    onClick={() => onLike(post)}
+                    liked={
+                      post.likes.findIndex(
+                        (p) =>
+                          p.toString() ===
+                          (auth.getCurrentUser() && auth.getCurrentUser()._id)
+                      ) === -1
+                        ? false
+                        : true
+                    }
+                  />
 
                   <Comment
                     onClick={() => onComment(post)}
@@ -155,6 +185,7 @@ export default function PostsCard({
               </div>
             </div>
           ))}
+      <LikedByModal post={post} />
     </div>
   );
 }

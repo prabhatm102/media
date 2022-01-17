@@ -3,6 +3,10 @@ import http from "./httpServices";
 
 const apiEndpoint = "/posts";
 
+export const toggleLike = (postId) => {
+  return http.post(apiEndpoint + "/toggleLike", { post: postId });
+};
+
 export const getAllPosts = () => {
   return http.get(apiEndpoint);
 };

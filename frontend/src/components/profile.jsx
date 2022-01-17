@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Redirect } from "react-router-dom";
 import auth from "../services/authService";
-import { getPosts, deletePost } from "../services/postService";
+import { toggleLike, getPosts, deletePost } from "../services/postService";
 
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { toast } from "react-toastify";
 
+import ProfileNavigation from "./profileNavigation";
 import PostsCard from "./postsCard";
 import PostForm from "./postForm";
 import ProfileHeader from "./profileHeader";
@@ -31,12 +32,30 @@ const Profile = () => {
         : "block";
     setPosts(allPosts);
   };
-  const handleLike = (post) => {
+  const handleLike = async (post) => {
     const allPosts = [...posts];
     const index = allPosts.indexOf(post);
     allPosts[index] = { ...post };
-    allPosts[index].liked = !allPosts[index].liked;
+
+    const isLiked = allPosts[index].likes.find(
+      (p) => p.toString() === user._id
+    );
+    if (!isLiked) {
+      allPosts[index].likes.push(user._id);
+    } else {
+      const likedBy = allPosts[index].likes.filter((p) => p !== user._id);
+      allPosts[index].likes = likedBy;
+    }
     setPosts(allPosts);
+
+    try {
+      const { data } = await toggleLike(post._id);
+      //  toast.success(data);
+    } catch (ex) {
+      if (ex.response && ex.response.status === 401) {
+        toast.error("Login to like posts.");
+      }
+    }
   };
   const handleEdit = async (post) => {};
   const handleDelete = async (post) => {
@@ -79,7 +98,7 @@ const Profile = () => {
       <ProfileHeader user={user} />
 
       <PostForm user={user} />
-
+      <ProfileNavigation user={user} onProfileView={() => {}} />
       <PostsCard
         onDelete={handleDelete}
         onEdit={handleEdit}

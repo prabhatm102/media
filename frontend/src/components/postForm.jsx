@@ -5,9 +5,16 @@ import { savePost } from "../services/postService";
 import { PostContext } from "../context/postContext";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
+// import { EditorState } from "draft-js";
+// import { Editor } from "react-draft-wysiwyg";
+
 const MySwal = withReactContent(Swal);
 
 export default function PostForm({ user }) {
+  // const [editorState, setEditorState] = useState(() =>
+  //   EditorState.createEmpty()
+  // );
+  const [imageUrl, setImageUrl] = useState("");
   const [posts, setPosts] = useContext(PostContext);
   const [data, setData] = useState({
     message: "",
@@ -50,6 +57,7 @@ export default function PostForm({ user }) {
         return;
       }
       newData[input.name] = input.files[0];
+      setImageUrl(URL.createObjectURL(input.files[0]));
     } else newData[input.name] = input.value;
     setData(newData);
   };
@@ -97,6 +105,10 @@ export default function PostForm({ user }) {
       }
     }
   };
+  // const editor = React.useRef(null);
+  // function focusEditor() {
+  //   editor.current.focus();
+  // }
   return (
     <div className="container-fluid">
       <div className="row">
@@ -115,15 +127,32 @@ export default function PostForm({ user }) {
               onSubmit={handleSubmit}
               encType="multipart/form-data"
             >
-              <div className="form-group mx-2">
+              {/* <div
+                className="me-2"
+                style={{
+                  border: "1px solid black",
+                  minHeight: "6em",
+                  //cursor: "text",
+
+                  minWidth: "12em",
+                }}
+                //  onClick={focusEditor}
+              // > */}
+              <div className="form-group me-2">
                 <input
                   type="text"
                   className="form-control"
                   id="message"
                   name="message"
+                  placeholder="What's in your mind?"
                   value={data.message}
                   onChange={(e) => handleChange(e.currentTarget)}
                 />
+                {/* <Editor
+                  ref={editor}
+                  editorState={editorState}
+                  onChange={setEditorState}
+                /> */}
               </div>
               <div className="form-group">
                 <label className="btn btn-outline-success">
@@ -142,7 +171,7 @@ export default function PostForm({ user }) {
               </div>
               {data.message.length > 0 && (
                 <button
-                  className="btn-sm btn-primary mx-2  m-auto"
+                  className="btn-sm btn-primary mx-2 mb-3  m-auto"
                   type="submit"
                   disabled={validate()}
                 >
@@ -152,6 +181,15 @@ export default function PostForm({ user }) {
             </form>
           </div>
         </div>
+      </div>
+      <div className="row">
+        {imageUrl && (
+          <img
+            src={imageUrl}
+            alt="..."
+            className="mx-auto img-fluid img-thumbnail rounded h-50 w-25"
+          />
+        )}
       </div>
     </div>
   );

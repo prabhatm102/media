@@ -5,8 +5,10 @@ const {
   addPost,
   getPostsById,
   deletePost,
+  toggleLike,
 } = require("../controller/post");
 const { validate } = require("../validation/post");
+const { validateLike } = require("../validation/likeValidation");
 const { validateObjectId } = require("../middleware/validate");
 
 const auth = require("../middleware/auth");
@@ -27,6 +29,8 @@ const upload = multer({ storage: storage });
 
 router.get("/:id", [getPostsById]);
 router.get("/", [getPosts]);
+
+router.post("/toggleLike", [auth, validateLike, toggleLike]);
 router.post(
   "/:id",
   upload.single("postFile"),

@@ -13,7 +13,10 @@ import AddFriend from "./common/addFriend";
 
 //............
 import { PostContext } from "../context/postContext";
-import { getUserById, addFriend } from "../services/userService";
+import { AllUser } from "../context/usersContext";
+import { getUserById, getFriends, addFriend } from "../services/userService";
+import { toggleLike } from "../services/postService";
+
 import ProfileNavigation from "./profileNavigation";
 
 //...........
@@ -22,7 +25,9 @@ import ProfileNavigation from "./profileNavigation";
 
 const UserProfile = ({ match }) => {
   const [posts, setPosts] = useContext(PostContext);
+  const [users, setUsers] = useContext(AllUser);
   const [user, setUser] = useState();
+  const [friends, setFriends] = useState([]);
 
   const handleComment = (post) => {
     const allPosts = [...posts];
@@ -35,12 +40,33 @@ const UserProfile = ({ match }) => {
         : "block";
     setPosts(allPosts);
   };
-  const handleLike = (post) => {
+  const handleLike = async (post) => {
     const allPosts = [...posts];
     const index = allPosts.indexOf(post);
     allPosts[index] = { ...post };
-    allPosts[index].liked = !allPosts[index].liked;
+
+    const isLiked = allPosts[index].likes.find(
+      (p) => p.toString() === auth.getCurrentUser()._id
+    );
+    if (!isLiked) {
+      allPosts[index].likes.push(auth.getCurrentUser()._id);
+    } else {
+      const likedBy = allPosts[index].likes.filter(
+        (p) => p !== auth.getCurrentUser()._id
+      );
+      allPosts[index].likes = likedBy;
+    }
+
     setPosts(allPosts);
+
+    try {
+      const { data } = await toggleLike(post._id);
+      //  toast.success(data);
+    } catch (ex) {
+      if (ex.response && ex.response.status === 401) {
+        toast.error("Login to like posts.");
+      }
+    }
   };
 
   const handleAddFriend = async () => {
@@ -59,29 +85,49 @@ const UserProfile = ({ match }) => {
         );
         userProfile.friends = updatedFriends;
       }
+      const allUsers = [...users];
+      const index = allUsers.indexOf(user);
 
+      allUsers[index] = userProfile;
+      setUsers(allUsers);
       setUser(userProfile);
-
       const { data } = await addFriend(user);
       toast.success(data);
     } catch (ex) {
       if (ex.response && ex.response.status === 400) {
         toast.error("Friend Already Exists");
+        setUsers(users);
         setUser(user);
       }
     }
   };
   useEffect(() => {
-    const getUser = async () => {
-      try {
-        const { data } = await getUserById(match.params.id);
-        setUser(data);
-      } catch (ex) {
-        toast.error("There is no user of id:" + match.params.id);
-      }
-    };
-    if (!user) getUser();
-  }, [user]);
+    const index = users.findIndex((u) => u._id === match.params.id);
+
+    if (index !== -1) {
+      // const getAllFriends = async () => {
+      //   try {
+      //     const { data } = await getFriends(users[index]._id);
+
+      //     setFriends(data);
+      //   } catch (ex) {
+      //     if (ex.response && ex.response.status === 400)
+      //       console.error(ex.message);
+      //   }
+      // };
+      // getAllFriends();
+      setUser(users[index]);
+    }
+    // const getUser = async () => {
+    //   try {
+    //     const { data } = await getUserById(match.params.id);
+    //     setUser(data);
+    //   } catch (ex) {
+    //     toast.error("There is no user of id:" + match.params.id);
+    //   }
+    // };
+    // if (!user) getUser();
+  }, [user, users]);
   useEffect(() => {
     const allPosts = async () => {
       const { data } = await getPosts(user._id);
@@ -97,23 +143,20 @@ const UserProfile = ({ match }) => {
       ) : (
         <>
           <ProfileHeader user={user} />
-          <button
-            className="btn btn-primary d-flex mx-auto p-2"
-            disabled={!auth.getCurrentUser() && true}
-          >
-            <AddFriend
-              onClick={() => handleAddFriend()}
-              friend={
-                user && auth.getCurrentUser()
-                  ? user.friends.indexOf(auth.getCurrentUser()._id) === -1
-                    ? false
-                    : true
-                  : false
-              }
-            />
-          </button>
+
+          <AddFriend
+            onClick={() => handleAddFriend()}
+            friend={
+              user && auth.getCurrentUser()
+                ? user.friends.indexOf(auth.getCurrentUser()._id) === -1
+                  ? false
+                  : true
+                : false
+            }
+          />
+
           <ProfileNavigation
-            userId={user._id}
+            user={user}
             onProfileView={setUser}
           ></ProfileNavigation>
           <PostsCard

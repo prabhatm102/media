@@ -4,13 +4,13 @@ import { getFriends } from "../services/userService";
 import auth from "../services/authService";
 // import { toast } from "toast";
 
-const ProfileNavigation = ({ userId, onProfileView }) => {
+const ProfileNavigation = ({ user, onProfileView }) => {
   const [friends, setFriends] = useState([]);
 
   useEffect(() => {
     const getAllFriends = async () => {
       try {
-        const { data } = await getFriends(userId);
+        const { data } = await getFriends(user._id);
 
         setFriends(data);
       } catch (ex) {
@@ -19,7 +19,7 @@ const ProfileNavigation = ({ userId, onProfileView }) => {
       }
     };
     getAllFriends();
-  }, []);
+  }, [user]);
   return (
     <div className="container-fluid  mb-3  mt-5">
       <div className="row p-0 mt-2">
@@ -47,6 +47,7 @@ const ProfileNavigation = ({ userId, onProfileView }) => {
               }}
             >
               <div className="card-text d-inline-block">
+                {friends.length <= 0 && <p>There is no friend. </p>}
                 {friends.map((friend) => (
                   <div className="friend-list d-inline-block" key={friend._id}>
                     <span>

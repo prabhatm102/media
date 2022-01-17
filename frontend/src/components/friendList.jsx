@@ -3,7 +3,7 @@ import React from "react";
 const FriendList = ({ friends, onShowConversation }) => {
   return (
     <div>
-      <div className="friends">
+      <div className="friends border">
         <div className="friends-header bg-success text-white text-center fs-3">
           <strong>Friends</strong>
         </div>
