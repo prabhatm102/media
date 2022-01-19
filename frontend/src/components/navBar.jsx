@@ -62,6 +62,14 @@ const NavBar = ({ user }) => {
                   Chats
                 </NavLink>
               </li>
+              <li className="nav-item my-2">
+                <NavLink className="nav-link" to="/notification">
+                  <i className="fa-lg fa fa-bell" aria-hidden="true"></i>
+                  <span className="position-absolute translate-middle p-1 bg-danger border border-light rounded-circle">
+                    <span className="visually-hidden">New alerts</span>
+                  </span>
+                </NavLink>
+              </li>
               <li className="nav-item">
                 <div className="dropdown ">
                   <NavLink

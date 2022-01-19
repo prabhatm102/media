@@ -34,21 +34,21 @@ const Chat = ({
     <div className="chat border border-1">
       <div className="chat-header bg-secondary text-white d-flex">
         <li className="list-group-item-active list-inline m-1">
-          <Link to={"/profile/" + receiver._id}>
+          <Link to={"/profile/" + receiver.user._id}>
             <img
-              src={process.env.REACT_APP_USER_IMAGE_URL + receiver.file}
+              src={process.env.REACT_APP_USER_IMAGE_URL + receiver.user.file}
               className="img-fluid rounded-circle m-2"
               alt="friend"
               style={{ height: "40px", width: "40px", cursor: "pointer" }}
             />
           </Link>
-          <strong> {receiver.name}</strong>{" "}
+          <strong> {receiver.user.name}</strong>{" "}
         </li>
         <div className="mt-3 ms-auto dropstart">
           <i
             className="me-5 fa-2x fa fa-video-camera"
             aria-hidden="true"
-            onClick={() => callUser(receiver._id)}
+            onClick={() => callUser(receiver.user._id)}
             data-bs-toggle="modal"
             data-bs-target="#videoModal"
             style={{ cursor: "pointer" }}
@@ -81,7 +81,7 @@ const Chat = ({
                   onClearChat(
                     conversations.length > 0
                       ? conversations[0].conversation
-                      : receiver._id
+                      : receiver.user._id
                   )
                 }
               >

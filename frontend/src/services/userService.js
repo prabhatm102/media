@@ -33,3 +33,6 @@ export const getFriends = (userId) => {
 export const addFriend = (friend) => {
   return http.put(apiEndpoint + "/addFriend", { friend: friend._id });
 };
+export const cancelRequest = (friend) => {
+  return http.put(apiEndpoint + "/cancelRequest", { friend: friend._id });
+};

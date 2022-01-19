@@ -17,6 +17,9 @@ const ContextProvider = ({ children }) => {
   const connectionRef = useRef();
 
   useEffect(() => {
+    if (auth.getCurrentUser())
+      socket.emit("joinRoom", auth.getCurrentUser()._id);
+
     if (navigator.mediaDevices)
       navigator.mediaDevices
         .getUserMedia({ video: true, audio: true })

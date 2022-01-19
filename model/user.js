@@ -38,8 +38,14 @@ const userSchema = new mongoose.Schema(
     },
     friends: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "users",
+        user: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "users",
+        },
+        status: {
+          type: String,
+          enum: ["requested", "sent", "pending", "success"],
+        },
       },
     ],
   },

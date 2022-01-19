@@ -3,7 +3,7 @@ import React from "react";
 const FriendList = ({ friends, onShowConversation }) => {
   return (
     <div>
-      <div className="friends border">
+      <div className="friends">
         <div className="friends-header bg-success text-white text-center fs-3">
           <strong>Friends</strong>
         </div>
@@ -12,20 +12,21 @@ const FriendList = ({ friends, onShowConversation }) => {
             {friends.map((friend) => (
               <li
                 className="list-group-item"
-                key={friend._id}
+                key={friend.user._id}
                 onClick={() => onShowConversation(friend)}
                 style={{ cursor: "pointer" }}
               >
                 <img
                   src={
-                    friend && process.env.REACT_APP_USER_IMAGE_URL + friend.file
+                    friend &&
+                    process.env.REACT_APP_USER_IMAGE_URL + friend.user.file
                   }
                   className="img-fluid rounded-circle m-2"
                   alt="friend"
                   style={{ height: "50px", width: "50px" }}
                 />
-                <strong> {friend.name}</strong>
-                {friend.status && (
+                <strong> {friend.user.name}</strong>
+                {friend.onLineStatus && (
                   <span className="mx-5 position-absolute start-50 top-50 p-2 bg-success border border-light rounded-circle translate-middle"></span>
                 )}
               </li>

@@ -33,11 +33,11 @@ const Conversation = ({ user }) => {
   const showConversation = (friend) => {
     const getChats = async () => {
       try {
-        const { data } = await getConversations(friend._id);
+        const { data } = await getConversations(friend.user._id);
         setConversations(data);
-        const receiver = friends.find((f) => f._id === friend._id);
+        const receiver = friends.find((f) => f.user._id === friend.user._id);
         setReceiver(receiver);
-        setCall({ from: receiver._id });
+        setCall({ from: receiver.user._id });
       } catch (ex) {
         if (ex.response && ex.response.status === 400) toast.error(ex.message);
       }
@@ -50,7 +50,7 @@ const Conversation = ({ user }) => {
     if (message.trim() !== "") {
       try {
         let conversation = {};
-        conversation.receiver = receiver._id;
+        conversation.receiver = receiver.user._id;
         conversation.message = message;
         const { data } = await saveConversation(conversation);
         setConversations([...conversations, data]);
@@ -93,7 +93,8 @@ const Conversation = ({ user }) => {
     const getAllFriends = async () => {
       try {
         const { data } = await getFriends(auth.getCurrentUser()._id);
-        setFriends(data);
+        const acceptedFriend = data.filter((f) => f.status === "success");
+        setFriends(acceptedFriend);
       } catch (ex) {
         if (ex.response && ex.response.status === 400) toast.error(ex.message);
       }
@@ -103,7 +104,7 @@ const Conversation = ({ user }) => {
   }, []);
 
   useEffect(() => {
-    socket.emit("joinRoom", auth.getCurrentUser()._id);
+    // socket.emit("joinRoom", auth.getCurrentUser()._id);
 
     socket.on("receiveMessage", (data) => {
       setConversations([...conversations, data]);
@@ -112,10 +113,10 @@ const Conversation = ({ user }) => {
     socket.on("userStatus", (data) => {
       if (friends.length > 0) {
         const index = friends.findIndex((f) => {
-          return f._id === data.id;
+          return f.user._id === data.id;
         });
         if (index > -1) {
-          friends[index].status = "true";
+          friends[index].onLineStatus = "true";
           setFriends((friends) => friends);
         }
       }
@@ -176,7 +177,7 @@ const Conversation = ({ user }) => {
           )}
         </div>
         <div className="col rounded-4 p-0">
-          {receiver._id && (
+          {receiver && receiver.user && (
             <Chat
               conversations={conversations}
               receiver={receiver}

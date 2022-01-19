@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import auth from "../services/authService";
-import PostForm from "./postComment";
+import PostComment from "./postComment";
 import Like from "./common/like";
 import Comment from "./common/comment";
 import { PostContext } from "../context/postContext";
@@ -12,14 +12,14 @@ export default function PostsCard({
   onEdit,
   onComment,
   onLike,
-  userId,
+  user,
 }) {
-  let [posts, setPosts] = useContext(PostContext);
+  let [posts] = useContext(PostContext);
   let [post, setPost] = useState();
 
-  if (onDelete || userId) {
+  if (onDelete || user) {
     posts = posts.filter(
-      (p) => p.user._id === (userId ? userId : auth.getCurrentUser()._id)
+      (p) => p.user._id === (user ? user._id : auth.getCurrentUser()._id)
     );
   }
 
@@ -101,7 +101,10 @@ export default function PostsCard({
                       </div>
                     </div>
 
-                    <p className="card-text mx-2">{post.message}</p>
+                    <p
+                      className="card-text mx-2"
+                      dangerouslySetInnerHTML={{ __html: post.message }}
+                    ></p>
                   </div>
                   {post.postFile && (
                     <img
@@ -155,17 +158,28 @@ export default function PostsCard({
                         <div key={c._id}>
                           <div className="comment d-flex my-4">
                             <div className="comment-image">
-                              <img
-                                src={
-                                  c.user &&
-                                  process.env.REACT_APP_USER_IMAGE_URL +
-                                    c.user.file
+                              <Link
+                                to={
+                                  "/profile/" +
+                                  (c.user_id !==
+                                  (auth.getCurrentUser() &&
+                                    auth.getCurrentUser()._id)
+                                    ? c.user._id
+                                    : "")
                                 }
-                                className="img-fluid rounded-start img-thumbnail m-2"
-                                alt="img"
-                                height="25"
-                                width="35"
-                              />
+                              >
+                                <img
+                                  src={
+                                    c.user &&
+                                    process.env.REACT_APP_USER_IMAGE_URL +
+                                      c.user.file
+                                  }
+                                  className="img-fluid rounded-start img-thumbnail m-2"
+                                  alt="img"
+                                  height="25"
+                                  width="35"
+                                />
+                              </Link>
                             </div>
                             <div
                               className="comment-content rounded-3 p-2 w-75"
@@ -177,9 +191,7 @@ export default function PostsCard({
                           </div>
                         </div>
                       ))}
-                    {auth.getCurrentUser() && (
-                      <PostForm post={post} posts={posts} setPosts={setPosts} />
-                    )}
+                    {auth.getCurrentUser() && <PostComment post={post} />}
                   </div>
                 </div>
               </div>

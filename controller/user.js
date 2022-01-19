@@ -1,3 +1,4 @@
+const io = require("../index");
 const { User } = require("../model/user");
 const { Post } = require("../model/post");
 const { Comment } = require("../model/comment");
@@ -8,10 +9,11 @@ const nodemailer = require("nodemailer");
 const fs = require("fs");
 const path = require("path");
 const winston = require("winston");
+const { isObject } = require("util");
 
 const getUserById = async (req, res, next) => {
   const user = await User.findOne({ _id: req.params.id }).select(
-    "name file friends"
+    "name file friends.user"
   );
   res.status(200).send(user);
 };
@@ -98,7 +100,7 @@ const updateUser = async (req, res, next) => {
 };
 const getFriends = async (req, res) => {
   const allFriends = await User.findOne({ _id: req.params.id })
-    .populate("friends", "_id name file")
+    .populate("friends.user", "_id name file")
     .select("-_id friends");
 
   res.status(200).send(allFriends.friends);
@@ -111,35 +113,83 @@ const addFriend = async (req, res, next) => {
   if (!sender) return res.status(400).send("Invalid sender");
 
   const friend = sender.friends.find(
-    (f) => f.toString() === req.body.friend.toString()
+    (f) => f.user.toString() === req.body.friend.toString()
   );
   if (friend) {
-    // if (friend) return res.status(400).send("Friend already exists!");
-    const friendList = sender.friends.filter(
-      (f) => f.toString() !== user._id.toString()
-    );
+    if (friend.status === "pending") {
+      const friendList = sender.friends.filter(
+        (f) => f.user.toString() !== req.body.friend.toString()
+      );
+      friend.status = "success";
+      friendList.push(friend);
 
-    sender.friends = friendList;
-    const userFriendList = user.friends.filter(
-      (f) => f.toString() !== sender._id.toString()
-    );
-    user.friends = userFriendList;
-    await user.save();
-    await sender.save();
-    return res.status(200).send("Friend removed successfully");
+      sender.friends = friendList;
+      const userFriendList = user.friends.filter(
+        (f) => f.user.toString() !== sender._id.toString()
+      );
+      userFriendList.push({ user: sender._id, status: "success" });
+      user.friends = userFriendList;
+      await user.save();
+      await sender.save();
+      // io.to(user._id.toString()).emit("friendRequest", friendList);
+      io.to(user._id.toString()).emit("friendRequest", sender);
+      return res.status(200).send("Friend Request Accepted");
+    }
   }
+  if (!friend) {
+    try {
+      sender.friends.push({ user: req.body.friend, status: "sent" });
 
-  try {
-    sender.friends.push(req.body.friend);
-    user.friends.push(sender._id);
-    await user.save();
-    await sender.save();
-    res.status(200).send("Friend added successfully");
-  } catch (ex) {
-    return res.status(400).send("bad request");
+      user.friends.push({ user: sender._id, status: "pending" });
+
+      await user.save();
+      await sender.save();
+      // io.to(user._id.toString()).emit("friendRequest", {
+      //   user: req.body.friend,
+      //   status: "sent",
+      // });
+      io.to(user._id.toString()).emit("friendRequest", sender);
+
+      return res.status(200).send("Friend request has sent");
+    } catch (ex) {
+      return res.status(400).send(ex.message);
+    }
   }
+  res.status(401).send("Friend Already Available");
 };
 
+const cancelRequest = async (req, res, next) => {
+  const user = await User.findOne({ _id: req.body.friend });
+  if (!user) return res.status(400).send("There is no friend of given id!");
+
+  const sender = await User.findOne({ _id: req.user._id });
+  if (!sender) return res.status(400).send("Invalid sender");
+
+  const friend = sender.friends.find(
+    (f) => f.user.toString() === req.body.friend.toString()
+  );
+  try {
+    if (friend) {
+      const friendList = sender.friends.filter(
+        (f) => f.user.toString() !== user._id.toString()
+      );
+
+      sender.friends = friendList;
+      const userFriendList = user.friends.filter(
+        (f) => f.user.toString() !== sender._id.toString()
+      );
+      user.friends = userFriendList;
+      await user.save();
+      await sender.save();
+      // io.to(user._id.toString()).emit("cancelRequest", { userFriendList });
+      io.to(user._id.toString()).emit("cancelRequest", sender);
+
+      return res.status(200).send("Friend request removed");
+    }
+  } catch (ex) {
+    return res.status(400).send("Bad Request");
+  }
+};
 const updatePass = async (req, res) => {
   try {
     const decoded = jwt.verify(req.body.authToken, config.get("jwtPrivateKey"));
@@ -253,6 +303,7 @@ module.exports = {
   getUsers,
   addUser,
   addFriend,
+  cancelRequest,
   getFriends,
   updateUser,
   updatePass,

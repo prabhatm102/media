@@ -9,12 +9,13 @@ import { toast } from "react-toastify";
 
 import PostsCard from "./postsCard";
 import ProfileHeader from "./profileHeader";
-import AddFriend from "./common/addFriend";
+import FriendRequestButton from "./friendRequestButton";
 
 //............
+import { socket } from "../context/socketContext";
 import { PostContext } from "../context/postContext";
 import { AllUser } from "../context/usersContext";
-import { getUserById, getFriends, addFriend } from "../services/userService";
+import { addFriend, cancelRequest } from "../services/userService";
 import { toggleLike } from "../services/postService";
 
 import ProfileNavigation from "./profileNavigation";
@@ -27,7 +28,7 @@ const UserProfile = ({ match }) => {
   const [posts, setPosts] = useContext(PostContext);
   const [users, setUsers] = useContext(AllUser);
   const [user, setUser] = useState();
-  const [friends, setFriends] = useState([]);
+  // const [friends, setFriends] = useState([]);
 
   const handleComment = (post) => {
     const allPosts = [...posts];
@@ -61,33 +62,64 @@ const UserProfile = ({ match }) => {
 
     try {
       const { data } = await toggleLike(post._id);
-      //  toast.success(data);
+      toast.success(data);
     } catch (ex) {
       if (ex.response && ex.response.status === 401) {
         toast.error("Login to like posts.");
       }
     }
   };
-
-  const handleAddFriend = async () => {
+  const handleCancelRequest = async () => {
     try {
       const userProfile = { ...user };
-      const friendIndex = userProfile.friends.indexOf(
-        auth.getCurrentUser()._id
+      const friend = userProfile.friends.find(
+        (u) => u.user === auth.getCurrentUser()._id
       );
-
-      if (friendIndex === -1)
-        userProfile.friends.push(auth.getCurrentUser()._id);
-      else {
-        const friends = [...userProfile.friends];
-        const updatedFriends = friends.filter(
-          (f) => f !== auth.getCurrentUser()._id
+      if (friend) {
+        const updatedFriends = userProfile.friends.filter(
+          (f) => f.user !== auth.getCurrentUser()._id
         );
         userProfile.friends = updatedFriends;
       }
       const allUsers = [...users];
       const index = allUsers.indexOf(user);
+      allUsers[index] = userProfile;
+      setUsers(allUsers);
+      setUser(userProfile);
 
+      const { data } = await cancelRequest(user);
+      toast.success(data);
+    } catch (ex) {
+      if (ex.response && ex.response.status === 400) {
+        toast.error("Friend Already Exists");
+      }
+    }
+  };
+  const handleAddFriend = async () => {
+    try {
+      const userProfile = { ...user };
+      const friend = userProfile.friends.find(
+        (u) => u.user === auth.getCurrentUser()._id
+      );
+      if (!friend)
+        userProfile.friends.push({
+          user: auth.getCurrentUser()._id,
+          status: "pending",
+        });
+      else if (friend.status === "sent") {
+        const friends = [...userProfile.friends];
+        const updatedFriends = friends.filter(
+          (f) => f.user !== auth.getCurrentUser()._id
+        );
+        updatedFriends.push({
+          user: auth.getCurrentUser()._id,
+          status: "success",
+        });
+
+        userProfile.friends = updatedFriends;
+      }
+      const allUsers = [...users];
+      const index = allUsers.indexOf(user);
       allUsers[index] = userProfile;
       setUsers(allUsers);
       setUser(userProfile);
@@ -96,45 +128,39 @@ const UserProfile = ({ match }) => {
     } catch (ex) {
       if (ex.response && ex.response.status === 400) {
         toast.error("Friend Already Exists");
-        setUsers(users);
-        setUser(user);
+        // setUsers(users);
+        // setUser(user);
       }
     }
   };
   useEffect(() => {
     const index = users.findIndex((u) => u._id === match.params.id);
-
     if (index !== -1) {
-      // const getAllFriends = async () => {
-      //   try {
-      //     const { data } = await getFriends(users[index]._id);
-
-      //     setFriends(data);
-      //   } catch (ex) {
-      //     if (ex.response && ex.response.status === 400)
-      //       console.error(ex.message);
-      //   }
-      // };
-      // getAllFriends();
       setUser(users[index]);
     }
-    // const getUser = async () => {
-    //   try {
-    //     const { data } = await getUserById(match.params.id);
-    //     setUser(data);
-    //   } catch (ex) {
-    //     toast.error("There is no user of id:" + match.params.id);
-    //   }
-    // };
-    // if (!user) getUser();
   }, [user, users]);
   useEffect(() => {
     const allPosts = async () => {
       const { data } = await getPosts(user._id);
       setPosts(...posts, data);
     };
-    if (posts.length === 0 && user) allPosts();
-  }, [user]);
+    if (user) allPosts();
+  }, []);
+
+  useEffect(() => {
+    socket.on("friendRequest", (data) => {
+      const index = users.findIndex((u) => u._id === data._id);
+      users[index] = data;
+      setUsers(users);
+      setUser(data);
+    });
+    socket.on("cancelRequest", (data) => {
+      const index = users.findIndex((u) => u._id === data._id);
+      users[index] = data;
+      setUsers(users);
+      setUser(data);
+    });
+  }, [socket]);
   // if (!user) return <Redirect to="/signin" />;
   return (
     <div className="container-fluid  p-0">
@@ -144,15 +170,10 @@ const UserProfile = ({ match }) => {
         <>
           <ProfileHeader user={user} />
 
-          <AddFriend
-            onClick={() => handleAddFriend()}
-            friend={
-              user && auth.getCurrentUser()
-                ? user.friends.indexOf(auth.getCurrentUser()._id) === -1
-                  ? false
-                  : true
-                : false
-            }
+          <FriendRequestButton
+            user={user}
+            onAddFriend={handleAddFriend}
+            onCancelRequest={handleCancelRequest}
           />
 
           <ProfileNavigation
@@ -162,7 +183,7 @@ const UserProfile = ({ match }) => {
           <PostsCard
             onComment={handleComment}
             onLike={handleLike}
-            userId={user._id}
+            user={user}
           />
         </>
       )}

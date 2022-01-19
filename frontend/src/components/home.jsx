@@ -26,7 +26,7 @@ const Home = ({ user }) => {
     setPosts(allPosts);
 
     try {
-      const { data } = await toggleLike(post._id);
+      await toggleLike(post._id);
       //  toast.success(data);
     } catch (ex) {
       if (ex.response && ex.response.status === 401) {
@@ -57,7 +57,7 @@ const Home = ({ user }) => {
     <div className="container-fluid p-0">
       {!user && <p className="alert alert-danger text-center">Login To Post</p>}
       {user && <PostForm user={user} />}
-      <PostsCard onComment={handleComment} onLike={handleLike} />
+      <PostsCard posts={posts} onComment={handleComment} onLike={handleLike} />
     </div>
   );
 };

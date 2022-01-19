@@ -1,3 +1,4 @@
+const io = require("../index");
 const { Post } = require("../model/post");
 const { Comment } = require("../model/comment");
 const { User } = require("../model/user");
@@ -134,6 +135,7 @@ const toggleLike = async (req, res, next) => {
   if (!user) return res.status(400).send("There is no user of given id!");
 
   const post = await Post.findOne({ _id: req.body.post });
+
   if (!post) return res.status(400).send("There is no post.");
 
   const isLiked = post.likes.find((p) => p.toString() === user._id.toString());
@@ -151,6 +153,13 @@ const toggleLike = async (req, res, next) => {
 
   try {
     post.likes.push(user._id);
+
+    if (post.user.toString() !== user._id.toString())
+      io.to(post.user.toString()).emit("postLiked", {
+        post: post,
+        likedBy: user,
+      });
+
     await post.save();
     res.status(200).send("Post Liked successfully");
   } catch (ex) {

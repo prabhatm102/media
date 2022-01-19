@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useEffect, useContext } from "react";
 import { Redirect } from "react-router-dom";
 import auth from "../services/authService";
 import { toggleLike, getPosts, deletePost } from "../services/postService";
@@ -49,7 +49,7 @@ const Profile = () => {
     setPosts(allPosts);
 
     try {
-      const { data } = await toggleLike(post._id);
+      await toggleLike(post._id);
       //  toast.success(data);
     } catch (ex) {
       if (ex.response && ex.response.status === 401) {
@@ -100,6 +100,7 @@ const Profile = () => {
       <PostForm user={user} />
       <ProfileNavigation user={user} onProfileView={() => {}} />
       <PostsCard
+        user={user}
         onDelete={handleDelete}
         onEdit={handleEdit}
         onComment={handleComment}

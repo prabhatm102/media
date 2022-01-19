@@ -6,6 +6,7 @@ const {
   addUser,
   getFriends,
   addFriend,
+  cancelRequest,
   updateUser,
   updatePass,
   deleteUser,
@@ -42,6 +43,8 @@ router.post("/", upload.single("file"), validate, addUser);
 router.post("/sendmail", validateEmail, sendMail);
 
 router.put("/addFriend", [auth, validateFriend, addFriend]);
+router.put("/cancelRequest", [auth, validateFriend, cancelRequest]);
+
 router.put("/changepassword/", [validatePass, auth, updatePass]);
 router.put("/:id", [
   upload.single("file"),

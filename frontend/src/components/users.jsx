@@ -1,6 +1,11 @@
 import React, { useState, useEffect, useContext } from "react";
 import { toast } from "react-toastify";
-import { getUsers, deleteUser, addFriend } from "../services/userService";
+import {
+  getUsers,
+  deleteUser,
+  addFriend,
+  cancelRequest,
+} from "../services/userService";
 import UserTable from "./userTable";
 import UserModel from "./userModel";
 import Pagination from "./common/pagination";
@@ -9,6 +14,7 @@ import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import auth from "../services/authService";
 import { AllUser } from "../context/usersContext";
+import { socket } from "../context/socketContext";
 // import auth from "../services/authService";
 
 const MySwal = withReactContent(Swal);
@@ -28,32 +34,121 @@ const Users = () => {
     };
     allUsers();
   }, []);
+  useEffect(() => {
+    socket.on("friendRequest", (data) => {
+      const index = users.findIndex((u) => u._id === data._id);
+      users[index] = data;
+      setUsers(users);
+      setUser(data);
+    });
+    socket.on("cancelRequest", (data) => {
+      const index = users.findIndex((u) => u._id === data._id);
+      users[index] = data;
+      setUsers(users);
+      setUser(data);
+    });
+  }, [socket, users]);
+
+  // const handleCancelRequest = async () => {
+  //   try {
+  //     const { data } = await cancelRequest(user);
+  //     toast.success(data);
+  //   } catch (ex) {
+  //     if (ex.response && ex.response.status === 400) {
+  //       toast.error("Friend Already Exists");
+  //     }
+  //   }
+  // };
+  // const handleAddFriend = async (user) => {
+  //   try {
+  //     const allUsers = [...users];
+  //     const index = allUsers.findIndex((u) => u._id === user._id);
+  //     const friendIndex = allUsers[index].friends.indexOf(
+  //       auth.getCurrentUser()._id
+  //     );
+
+  //     if (friendIndex === -1)
+  //       allUsers[index].friends.push(auth.getCurrentUser()._id);
+  //     else {
+  //       const friends = [...allUsers[index].friends];
+  //       const updatedFriends = friends.filter(
+  //         (f) => f !== auth.getCurrentUser()._id
+  //       );
+  //       allUsers[index].friends = updatedFriends;
+  //     }
+
+  //     setUsers(allUsers);
+
+  //     const { data } = await addFriend(user);
+  //     toast.success(data);
+  //   } catch (ex) {
+  //     if (ex.response && ex.response.status === 400) {
+  //       toast.error("Friend Already Exists");
+  //       setUsers(users);
+  //     }
+  //   }
+  // };
+  const handleCancelRequest = async (user) => {
+    try {
+      const userProfile = { ...user };
+      const friend = userProfile.friends.find(
+        (u) => u.user === auth.getCurrentUser()._id
+      );
+      if (friend) {
+        const updatedFriends = userProfile.friends.filter(
+          (f) => f.user !== auth.getCurrentUser()._id
+        );
+        userProfile.friends = updatedFriends;
+      }
+      const allUsers = [...users];
+      const index = allUsers.indexOf(user);
+      allUsers[index] = userProfile;
+      setUsers(allUsers);
+      setUser(userProfile);
+
+      const { data } = await cancelRequest(user);
+      toast.success(data);
+    } catch (ex) {
+      if (ex.response && ex.response.status === 400) {
+        toast.error("Friend Already Exists");
+      }
+    }
+  };
   const handleAddFriend = async (user) => {
     try {
-      const allUsers = [...users];
-      const index = allUsers.findIndex((u) => u._id === user._id);
-      const friendIndex = allUsers[index].friends.indexOf(
-        auth.getCurrentUser()._id
+      const userProfile = { ...user };
+      const friend = userProfile.friends.find(
+        (u) => u.user === auth.getCurrentUser()._id
       );
-
-      if (friendIndex === -1)
-        allUsers[index].friends.push(auth.getCurrentUser()._id);
-      else {
-        const friends = [...allUsers[index].friends];
+      if (!friend)
+        userProfile.friends.push({
+          user: auth.getCurrentUser()._id,
+          status: "pending",
+        });
+      else if (friend.status === "sent") {
+        const friends = [...userProfile.friends];
         const updatedFriends = friends.filter(
-          (f) => f !== auth.getCurrentUser()._id
+          (f) => f.user !== auth.getCurrentUser()._id
         );
-        allUsers[index].friends = updatedFriends;
+        updatedFriends.push({
+          user: auth.getCurrentUser()._id,
+          status: "success",
+        });
+
+        userProfile.friends = updatedFriends;
       }
-
+      const allUsers = [...users];
+      const index = allUsers.indexOf(user);
+      allUsers[index] = userProfile;
       setUsers(allUsers);
-
+      setUser(userProfile);
       const { data } = await addFriend(user);
       toast.success(data);
     } catch (ex) {
       if (ex.response && ex.response.status === 400) {
         toast.error("Friend Already Exists");
-        setUsers(users);
+        // setUsers(users);
+        // setUser(user);
       }
     }
   };
@@ -117,6 +212,7 @@ const Users = () => {
           onEdit={handleEdit}
           onDetails={handleDetails}
           onAddFriend={handleAddFriend}
+          onCancelRequest={handleCancelRequest}
         />
         <Pagination
           itemCount={totalCount}

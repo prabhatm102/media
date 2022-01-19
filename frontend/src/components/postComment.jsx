@@ -1,10 +1,11 @@
 import React, { useState, useContext } from "react";
+import { Link } from "react-router-dom";
 import Joi from "joi-browser";
 import { saveComment } from "../services/commentService";
 import auth from "../services/authService";
 import { PostContext } from "../context/postContext";
 
-export default function PostForm({ post }) {
+export default function PostComment({ post }) {
   const [posts, setPosts] = useContext(PostContext);
   const user = auth.getCurrentUser();
   const [data, setData] = useState({
@@ -81,38 +82,45 @@ export default function PostForm({ post }) {
     <div className="container-fluid">
       <div className="row">
         <div className="col">
-          <div className="comment  d-flex">
-            <img
-              src={process.env.REACT_APP_USER_IMAGE_URL + user.file}
-              className="img-fluid img-thumbnail m-1"
-              alt="userDetails"
-              height="10"
-              width="30"
-            />
+          <div className="comment">
             <form
               className="d-flex"
               onSubmit={handleSubmit}
               encType="multipart/form-data"
             >
-              <input
-                type="text"
-                className="form-control mx-2"
-                id="comment"
-                name="comment"
-                value={data.comment}
-                onChange={(e) => handleChange(e.currentTarget)}
-                style={{ height: "35px", width: "120px" }}
-              />
+              <div className="input-group mb-3">
+                <span
+                  className="input-group-text p-0" /*</div>id="basic-addon1"*/
+                >
+                  <Link to="/profile/">
+                    <img
+                      src={process.env.REACT_APP_USER_IMAGE_URL + user.file}
+                      className="img-fluid p-0"
+                      alt="..."
+                      height="10"
+                      width="30"
+                    />
+                  </Link>
+                </span>
+                <input
+                  type="text"
+                  aria-label="comment"
+                  className="form-control"
+                  id="comment"
+                  name="comment"
+                  placeholder="Write comment..."
+                  value={data.comment}
+                  onChange={(e) => handleChange(e.currentTarget)}
+                />
 
-              {data.comment.length > 0 && (
                 <button
-                  className="btn btn-outline-primary btn-sm form-control"
+                  className="btn btn-outline-primary"
                   type="submit"
                   disabled={validate()}
                 >
-                  <i className="fa fa-paper-plane" aria-hidden="true"></i>
+                  <i className="fa-lg fa fa-paper-plane" aria-hidden="true"></i>
                 </button>
-              )}
+              </div>
             </form>
           </div>
         </div>

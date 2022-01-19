@@ -1,7 +1,7 @@
 const { Post } = require("../model/post");
 const { User } = require("../model/user");
 const { Comment } = require("../model/comment");
-
+const io = require("../index");
 // const getCommentsById = async (req, res, next) => {
 //   const posts = await Post.find({ user: req.params.id })
 //     .populate("user", "name _id file createdAt updatedAt")
@@ -51,6 +51,12 @@ const addComment = async (req, res, next) => {
 
   post.comments.push(comment._id);
   await post.save();
+
+  if (post.user.toString() !== user._id.toString())
+    io.to(post.user.toString()).emit("postComment", {
+      post: post,
+      commentedBy: user,
+    });
 
   updatedPost = await Post.findOne({ _id: post._id })
     .populate("user", "name _id file createdAt updatedAt")

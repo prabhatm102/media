@@ -2,8 +2,15 @@ import React from "react";
 import { Link } from "react-router-dom";
 import auth from "../services/authService";
 import Table from "./common/table";
-import AddFriend from "./common/addFriend";
-const UserTable = ({ users, onEdit, onDelete, onDetails, onAddFriend }) => {
+import FriendRequestButton from "./friendRequestButton";
+const UserTable = ({
+  users,
+  onEdit,
+  onDelete,
+  onDetails,
+  onAddFriend,
+  onCancelRequest,
+}) => {
   const columns = [
     {
       key: "file",
@@ -33,16 +40,22 @@ const UserTable = ({ users, onEdit, onDelete, onDetails, onAddFriend }) => {
     {
       key: "addFriend",
       content: (user) => (
-        <AddFriend
-          onClick={() => onAddFriend(user)}
-          friend={
-            auth.getCurrentUser()
-              ? user.friends.indexOf(auth.getCurrentUser()._id) === -1
-                ? false
-                : true
-              : false
-          }
+        <FriendRequestButton
+          user={user}
+          onAddFriend={() => onAddFriend(user)}
+          onCancelRequest={() => onCancelRequest(user)}
         />
+
+        // <AddFriend
+        //   onClick={() => onAddFriend(user)}
+        //   friend={
+        //     auth.getCurrentUser()
+        //       ? user.friends.indexOf(auth.getCurrentUser()._id) === -1
+        //         ? false
+        //         : true
+        //       : false
+        //   }
+        // />
       ),
     },
     {

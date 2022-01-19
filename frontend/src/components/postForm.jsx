@@ -5,15 +5,12 @@ import { savePost } from "../services/postService";
 import { PostContext } from "../context/postContext";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-// import { EditorState } from "draft-js";
-// import { Editor } from "react-draft-wysiwyg";
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
 const MySwal = withReactContent(Swal);
 
 export default function PostForm({ user }) {
-  // const [editorState, setEditorState] = useState(() =>
-  //   EditorState.createEmpty()
-  // );
   const [imageUrl, setImageUrl] = useState("");
   const [posts, setPosts] = useContext(PostContext);
   const [data, setData] = useState({
@@ -41,9 +38,9 @@ export default function PostForm({ user }) {
     else delete allErrors[input.name];
 
     setErrors(allErrors);
-
+    // if (input.files) setImageUrl("");
     const newData = { ...data };
-
+    if (input.files.length === 0) setImageUrl("");
     if (input.files && input.files.length > 0) {
       const allowedExt = [
         "image/png",
@@ -90,6 +87,7 @@ export default function PostForm({ user }) {
       prevPosts.push(response.data);
       setPosts(prevPosts);
       setData({ message: "", postFile: undefined });
+      setImageUrl("");
       await MySwal.fire({
         position: "center",
         icon: "success",
@@ -105,16 +103,13 @@ export default function PostForm({ user }) {
       }
     }
   };
-  // const editor = React.useRef(null);
-  // function focusEditor() {
-  //   editor.current.focus();
-  // }
+
   return (
     <div className="container-fluid">
       <div className="row">
         <div className="col">
           <div className="post-form  d-flex h-100">
-            <Link to="/profile/" className=" ms-auto">
+            <Link to="/profile/" className="ms-auto">
               <img
                 src={process.env.REACT_APP_USER_IMAGE_URL + user.file}
                 className="img-fluid rounded-pill"
@@ -127,19 +122,8 @@ export default function PostForm({ user }) {
               onSubmit={handleSubmit}
               encType="multipart/form-data"
             >
-              {/* <div
-                className="me-2"
-                style={{
-                  border: "1px solid black",
-                  minHeight: "6em",
-                  //cursor: "text",
-
-                  minWidth: "12em",
-                }}
-                //  onClick={focusEditor}
-              // > */}
               <div className="form-group me-2">
-                <input
+                {/* <input
                   type="text"
                   className="form-control"
                   id="message"
@@ -147,12 +131,29 @@ export default function PostForm({ user }) {
                   placeholder="What's in your mind?"
                   value={data.message}
                   onChange={(e) => handleChange(e.currentTarget)}
-                />
-                {/* <Editor
-                  ref={editor}
-                  editorState={editorState}
-                  onChange={setEditorState}
                 /> */}
+
+                <CKEditor
+                  editor={ClassicEditor}
+                  data={data.message}
+                  onReady={(editor) => {
+                    // You can store the "editor" and use when it is needed.
+                    // console.log("Editor is ready to use!", editor);
+                  }}
+                  onChange={(event, editor) => {
+                    //const data = editor.getData();
+                    //   console.log({ event, editor, data });
+                    const newData = { ...data };
+                    newData.message = editor.getData();
+                    setData(newData);
+                  }}
+                  onBlur={(event, editor) => {
+                    //    console.log("Blur.", editor);
+                  }}
+                  onFocus={(event, editor) => {
+                    //   console.log("Focus.", editor);
+                  }}
+                />
               </div>
               <div className="form-group">
                 <label className="btn btn-outline-success">
@@ -171,7 +172,7 @@ export default function PostForm({ user }) {
               </div>
               {data.message.length > 0 && (
                 <button
-                  className="btn-sm btn-primary mx-2 mb-3  m-auto"
+                  className="btn-sm btn-primary me-auto mb-3  m-auto"
                   type="submit"
                   disabled={validate()}
                 >

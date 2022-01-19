@@ -7,6 +7,7 @@ import Profile from "./components/profile";
 import UserProfile from "./components/userProfile";
 import Users from "./components/users";
 import Conversation from "./components/conversation";
+import Notification from "./components/notification";
 import Signup from "./components/signup";
 import Signin from "./components/signin";
 import Logout from "./components/logout";
@@ -58,7 +59,10 @@ function App() {
 
                   {/* <ProtectedRouteAdmin path="/users" component={Users} /> */}
                   <ProtectedRoute path="/users" component={Users} />
-
+                  <ProtectedRoute
+                    path="/notification"
+                    component={Notification}
+                  />
                   <ProtectedRoute
                     path="/conversation"
                     render={(props) => <Conversation {...props} user={user} />}

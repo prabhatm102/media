@@ -11,8 +11,8 @@ const ProfileNavigation = ({ user, onProfileView }) => {
     const getAllFriends = async () => {
       try {
         const { data } = await getFriends(user._id);
-
-        setFriends(data);
+        const f = data.filter((d) => d.status === "success");
+        setFriends(f);
       } catch (ex) {
         if (ex.response && ex.response.status === 400)
           console.error(ex.message);
@@ -20,6 +20,7 @@ const ProfileNavigation = ({ user, onProfileView }) => {
     };
     getAllFriends();
   }, [user]);
+
   return (
     <div className="container-fluid  mb-3  mt-5">
       <div className="row p-0 mt-2">
@@ -49,21 +50,25 @@ const ProfileNavigation = ({ user, onProfileView }) => {
               <div className="card-text d-inline-block">
                 {friends.length <= 0 && <p>There is no friend. </p>}
                 {friends.map((friend) => (
-                  <div className="friend-list d-inline-block" key={friend._id}>
+                  <div
+                    className="friend-list d-inline-block"
+                    key={friend.user._id}
+                  >
                     <span>
                       <Link
                         to={
                           "/profile/" +
-                          (friend._id !==
+                          (friend.user._id !==
                           (auth.getCurrentUser() && auth.getCurrentUser()._id)
-                            ? friend._id
+                            ? friend.user._id
                             : "")
                         }
                       >
                         <img
                           src={
                             friend &&
-                            process.env.REACT_APP_USER_IMAGE_URL + friend.file
+                            process.env.REACT_APP_USER_IMAGE_URL +
+                              friend.user.file
                           }
                           className="img-fluid img-thumbnail m-2"
                           alt="friend"
@@ -72,7 +77,7 @@ const ProfileNavigation = ({ user, onProfileView }) => {
                         />
                       </Link>
                       <div>
-                        <strong>{friend.name}</strong>
+                        <strong>{friend.user.name}</strong>
                       </div>
                     </span>
                   </div>
