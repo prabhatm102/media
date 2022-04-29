@@ -1,0 +1,5 @@
+{
+  "jwtPrivateKey": "123@#mysecretkey",
+  "db": "mongodb+srv://prabhat:%26y2XyZWb3@media.9po1n.mongodb.net/media-11?authSource=admin&replicaSet=atlas-6bgszl-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true",
+  "mailPass": "123@#abc"
+}
