@@ -34,6 +34,7 @@ const getConversation = async (req, res, next) => {
       isDeleted: false,
     })
       .populate("sender", "name _id file ")
+      .populate("conversation")
       .select("-__v -isDeleted");
   else chats = [];
   res.status(200).send(chats);
@@ -137,6 +138,7 @@ const addConversation = async (req, res, next) => {
     // })
     // .select(" -__v");
     .populate("sender", "name _id file ")
+    .populate("conversation")
     .select("-__v -isDeleted");
   io.to(req.body.receiver).emit(
     "receiveMessage",
